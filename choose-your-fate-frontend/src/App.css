@@ -1,93 +1,109 @@
-* {
+:root {
+  --text: #6b6375;
+  --text-h: white;
+  --bg: #282c34;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-size: 20px;
-}
-
-p {
-  display: inline;
-}
-
-.dialogContainer {
-  position: absolute;
-  bottom: 5%;
-  left: 20%;
-  width: 60%;
-  height: 30%;
-  border-radius: 5px;
-  border: 5px solid grey;
-  background-color: black;
-  overflow-y: auto;
-  animation: createBox .5s;
-  padding: 10px 10px;
-}
-
-.dialogTextContainer {
-  overflow: hidden;
-  letter-spacing: .15em;
-  white-space: pre-wrap;
-}
-
-.bottomRightCorner {
-  float: right;
-}
-
-@keyframes createBox {
-  from {
-    transform: scale(0);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-.button {
-  padding: 5px 5px;
-  border-radius: 5px;
-  background-color: rgb(78, 52, 172);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #282c34;
+  font-size: calc(10px + 2vmin);
   color: white;
-  border: 0px;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  height: 100%;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
   font-size: 24px;
-  cursor: pointer;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
 }
 
-.floatRight {
-  float: right;
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
 }
 
-.margin-right-10 {
-  margin-right: 10px;
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
 }
 
-.dialogChoiceContainer {
-  position: absolute;
-  left: 60%;
-  width: 302px;
-  bottom: 36%;
-  /* height: 30%; */
-  border-radius: 5px;
-  border: 5px solid grey;
-  background-color: black;
-  overflow: auto;
-  animation: createBox .5s;
-  padding: 10px 10px;
+.flow-root {
+  display: flow-root;
 }
 
-.choice {
-  overflow: hidden;
-  letter-spacing: .15em;
-  margin: 1px;
-  padding: 2px;
-  border: 2px solid black;
-  /* white-space: pre-wrap; */
+.auto-width {
+  width: auto;
 }
 
-.choice:hover {
-  overflow: hidden;
-  letter-spacing: .15em;
-  margin: 1px;
-  padding: 2px;
-  border: 2px solid grey;
-  /* white-space: pre-wrap; */
+.auto-height {
+  height: auto;
+}
+
+.border {
+    border: 1px solid #ccc !important;
 }

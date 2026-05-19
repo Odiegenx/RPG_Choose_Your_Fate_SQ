@@ -14,17 +14,11 @@ import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlChoiceService;
 @Service
 public class ChoiceService {
     private final SqlChoiceService sqlChoiceService;
-    //private final Neo4jChoiceService neo4jChoiceService;
-    //private final MongoChoiceService mongoChoiceService;
 
     public ChoiceService(
             SqlChoiceService sqlChoiceService
-            //Neo4jChoiceervice neo4jChoiceService,
-            //MongoChoiceService mongoChoiceService
     ) {
         this.sqlChoiceService = sqlChoiceService;
-        //this.neo4jChoiceService = neo4jChoiceService;
-        //this.mongoChoiceService = mongoChoiceService;
     }
 
     public List<ChoiceResponseDTO> getAllChoices(DataSourceType source) {
@@ -54,8 +48,6 @@ public class ChoiceService {
     private ChoiceDataAccess resolveDataService(DataSourceType source) {
         return switch (source) {
             case SQL -> sqlChoiceService;
-            //case NEO4J -> neo4jChoiceService;
-            //case MONGODB -> mongoChoiceservice;
             default -> throw new IllegalArgumentException("Unexpected value: " + source);
         };
     }

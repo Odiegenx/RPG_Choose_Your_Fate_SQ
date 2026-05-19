@@ -64,7 +64,7 @@ Choose Your Fate is a client-server web application consisting of:
 - A relational database for persistent storage
 - An external public API integration
 
-For the Software Quality version of the project, the primary persistence strategy is relational. MongoDB and Neo4j are excluded from this version of the system description. Instead, the system architecture is intended to include:
+For the Software Quality version of the project, the persistence strategy is relational. The system architecture is intended to include:
 
 - One primary SQL database instance
 - One mirrored or standby SQL database instance for improved availability

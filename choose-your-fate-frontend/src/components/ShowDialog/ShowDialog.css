@@ -1,0 +1,94 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 20px;
+}
+
+p {
+  display: inline;
+}
+
+.dialogContainer {
+  color: #f3f4f6;    
+  position: absolute;
+  bottom: 5%;
+  left: 20%;
+  width: 60%;
+  height: 30%;
+  border-radius: 5px;
+  border: 5px solid grey;
+  background-color: black;
+  overflow-y: auto;
+  animation: createBox .5s;
+  padding: 10px 10px;
+}
+
+.dialogTextContainer {
+  overflow: hidden;
+  letter-spacing: .15em;
+  white-space: pre-wrap;
+}
+
+.bottomRightCorner {
+  float: right;
+}
+
+@keyframes createBox {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.button {
+  padding: 5px 5px;
+  border-radius: 5px;
+  background-color: rgb(78, 52, 172);
+  color: white;
+  border: 0px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.floatRight {
+  float: right;
+}
+
+.margin-right-10 {
+  margin-right: 10px;
+}
+
+.dialogChoiceContainer {
+  position: absolute;
+  left: 60%;
+  width: 302px;
+  bottom: 36%;
+  /* height: 30%; */
+  border-radius: 5px;
+  border: 5px solid grey;
+  background-color: black;
+  overflow: auto;
+  animation: createBox .5s;
+  padding: 10px 10px;
+}
+
+.choice {
+  overflow: hidden;
+  letter-spacing: .15em;
+  margin: 1px;
+  padding: 2px;
+  border: 2px solid black;
+  /* white-space: pre-wrap; */
+}
+
+.choice:hover {
+  overflow: hidden;
+  letter-spacing: .15em;
+  margin: 1px;
+  padding: 2px;
+  border: 2px solid grey;
+  /* white-space: pre-wrap; */
+}

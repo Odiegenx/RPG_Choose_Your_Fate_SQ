@@ -1,9 +1,13 @@
 package dk.ek.gruppe2.chooseyourfate.controller;
 
 import dk.ek.gruppe2.chooseyourfate.dto.AccountResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateAccountRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.UpdateAccountRequestDTO;
+import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.service.AccountService;
+import dk.ek.gruppe2.chooseyourfate.service.CharacterService;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +20,12 @@ public class AccountController {
     private static final String DATA_SOURCE_HEADER = "X-Data-Source";
 
     private final AccountService accountService;
+    private final CharacterService characterService;
 
-    public AccountController(AccountService accountService) {
+
+    public AccountController(AccountService accountService, CharacterService characterService) {
         this.accountService = accountService;
+        this.characterService = characterService;
     }
 
     @GetMapping

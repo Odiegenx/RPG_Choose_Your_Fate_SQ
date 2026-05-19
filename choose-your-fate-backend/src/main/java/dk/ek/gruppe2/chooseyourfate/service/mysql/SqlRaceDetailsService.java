@@ -73,6 +73,6 @@ public class SqlRaceDetailsService implements RaceDetailsDataAccess {
     }
 
     private RaceDetailsResponseDTO toDto(RaceDetails raceDetails) {
-        return new RaceDetailsResponseDTO(raceDetails.getId());
+        return new RaceDetailsResponseDTO(raceDetails.getId(), raceDetails.getName());
     }
 }

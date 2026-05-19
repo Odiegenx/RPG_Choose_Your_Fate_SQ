@@ -14,45 +14,6 @@ services:
       - ./rpg_mysql:/docker-entrypoint-initdb.d
     hostname: rpg_mysql
 
-  rpg_neo4j:
-    image: neo4j:5.26
-    container_name: rpg_neo4j
-    ports:
-      - "7474:7474"
-      - "7687:7687"
-    environment:
-      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-12345678}
-    volumes:
-      - rpg_neo4j:/data
-    hostname: rpg_neo4j
-
-  rpg_mongodb:
-    image: mongo:7.0
-    container_name: rpg_mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-123456}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-rpg_db}
-      MONGO_ADMIN_USERNAME: ${MONGO_ADMIN_USERNAME:-rpg_admin}
-      MONGO_ADMIN_PASSWORD: ${MONGO_ADMIN_PASSWORD:-rpg_admin_password}
-      MONGO_APP_USERNAME: ${MONGO_APP_USERNAME:-rpg_app}
-      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:-rpg_app_password}
-    volumes:
-      - rpg_mongodb:/data/db
-      - ./rpg_mongodb:/docker-entrypoint-initdb.d
-    hostname: rpg_mongodb
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username \"$$MONGO_INITDB_ROOT_USERNAME\" --password \"$$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin --eval \"db.adminCommand('ping')\""]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
   rpg_mysql:
-    driver: local
-  rpg_neo4j:
-    driver: local
-  rpg_mongodb:
     driver: local

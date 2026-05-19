@@ -1,0 +1,17 @@
+#character-path-story{
+    width: 28vw;
+    border: 1px solid #ccc !important;
+    margin: 10px 0px;
+
+    display: grid;
+    grid-template-rows: auto 1fr; 
+}
+
+#paragraph {
+    overflow-y: auto;
+    overflow-x: auto;   
+    min-height: 0;     
+    padding: 10px;
+    overflow-wrap: break-word;
+    display: block;
+}

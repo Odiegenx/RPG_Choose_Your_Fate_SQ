@@ -5,13 +5,16 @@ import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 
 import java.util.List;
 
-public interface CharacterDataAccess {
+public interface CharacterDataAccess<T> {
 
     List<CharacterResponseDTO> getAllCharacters();
 
-    CharacterResponseDTO getCharacterById(Integer id);
+    CharacterResponseDTO getCharacterById(T id);
 
     CharacterResponseDTO createCharacter(CreateCharacterRequestDTO request);
 
-    void deleteCharacter(Integer id);
+    void deleteCharacter(T id);
+
+    List<CharacterResponseDTO> getCharactersByAccountId(T id);
+
 }

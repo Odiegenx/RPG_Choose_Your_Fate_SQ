@@ -5,9 +5,7 @@ import dk.ek.gruppe2.chooseyourfate.dto.CharacterPathResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.UpdateCharacterPathRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterPathDataAccess;
-import dk.ek.gruppe2.chooseyourfate.service.mongodb.MongoCharacterPathService;
 import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlCharacterPathService;
-import dk.ek.gruppe2.chooseyourfate.service.neo4j.Neo4jCharacterPathService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,19 +15,13 @@ public class CharacterPathService {
 
     private final DataSourceResolver dataSourceResolver;
     private final SqlCharacterPathService sqlCharacterPathService;
-    private final Neo4jCharacterPathService neo4jCharacterPathService;
-    private final MongoCharacterPathService mongoCharacterPathService;
 
     public CharacterPathService(
             DataSourceResolver dataSourceResolver,
-            SqlCharacterPathService sqlCharacterPathService,
-            Neo4jCharacterPathService neo4jCharacterPathService,
-            MongoCharacterPathService mongoCharacterPathService
+            SqlCharacterPathService sqlCharacterPathService
     ) {
         this.dataSourceResolver = dataSourceResolver;
         this.sqlCharacterPathService = sqlCharacterPathService;
-        this.neo4jCharacterPathService = neo4jCharacterPathService;
-        this.mongoCharacterPathService = mongoCharacterPathService;
     }
 
     public List<CharacterPathResponseDTO> getAllCharacterPaths(String sourceHeader) {
@@ -52,8 +44,6 @@ public class CharacterPathService {
         DataSourceType dataSourceType = dataSourceResolver.resolve(sourceHeader);
         return switch (dataSourceType) {
             case SQL -> sqlCharacterPathService;
-            case NEO4J -> neo4jCharacterPathService;
-            case MONGODB -> mongoCharacterPathService;
         };
     }
 }

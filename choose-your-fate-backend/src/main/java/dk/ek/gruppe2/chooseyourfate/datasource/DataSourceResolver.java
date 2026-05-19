@@ -13,8 +13,6 @@ public class DataSourceResolver {
 
         return switch (headerValue.trim().toLowerCase()) {
             case "sql", "mysql" -> DataSourceType.SQL;
-            case "neo4j", "graph" -> DataSourceType.NEO4J;
-            case "mongodb", "mongo", "document" -> DataSourceType.MONGODB;
             default -> throw new IllegalArgumentException("Unsupported data source: " + headerValue);
         };
     }

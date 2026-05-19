@@ -1,0 +1,14 @@
+.cw-container {
+    height: 100%;
+    display: grid;
+    grid-auto-flow: column dense;
+    justify-content: start;
+    column-gap: 40px;
+}
+
+.cw-container-row {
+    height: 100%;
+    display: grid;
+    grid-auto-flow: row dense;
+    justify-content: center;
+}

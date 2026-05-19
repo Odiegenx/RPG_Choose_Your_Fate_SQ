@@ -14,17 +14,11 @@ import java.util.List;
 public class ChapterService {
 
     private final SqlChapterService sqlChapterService;
-    //private final Neo4jChapterService neo4jChapterService;
-    //private final MongoChapterService mongoChapterService;
 
     public ChapterService(
             SqlChapterService sqlChapterService
-            //Neo4jChapterervice neo4jChapterService,
-            //MongoChapterService mongoChapterService
     ) {
         this.sqlChapterService = sqlChapterService;
-        //this.neo4jChapterService = neo4jChapterService;
-        //this.mongoChapterService = mongoChapterService;
     }
 
     public List<ChapterResponseDTO> getAllChapters(DataSourceType source) {
@@ -54,8 +48,6 @@ public class ChapterService {
     private ChapterDataAccess resolveDataService(DataSourceType source) {
         return switch (source) {
             case SQL -> sqlChapterService;
-            //case NEO4J -> neo4jChapterService;
-            //case MONGODB -> mongoChapterservice;
             default -> throw new IllegalArgumentException("Unexpected value: " + source);
         };
     }

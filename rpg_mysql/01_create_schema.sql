@@ -27,10 +27,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`account` (
   `email` VARCHAR(100) NOT NULL UNIQUE,
   `password` VARCHAR(100) NOT NULL,
   `role` VARCHAR(50) NOT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`chapter`
@@ -38,17 +38,29 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `choose_your_fate`.`chapter` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
+  `starting_scene_id` INT NULL, -- Has to not be NOT NULL, since it otherwise creates a loop with scenes table which needs a chapter to be created
+  PRIMARY KEY (`id`),
+  INDEX `starting_scene_idx` (`starting_scene_id` ASC) VISIBLE,
+  CONSTRAINT `fk_starting_scene_chapter`
+    FOREIGN KEY (`starting_scene_id`)
+    REFERENCES `choose_your_fate`.`scene` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`race_details`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `choose_your_fate`.`race_details` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'BOB rules them all!',
-  PRIMARY KEY (`id`))
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  `starting_chapter_id` INT NOT NULL, -- needed to determine where the character starts on creating new character
+  PRIMARY KEY (`id`),
+  INDEX `starting_chapter_idx` (`starting_chapter_id` ASC) VISIBLE,
+  CONSTRAINT `fk_starting_chapter_race_details`
+    FOREIGN KEY (`starting_chapter_id`)
+    REFERENCES `choose_your_fate`.`chapter` (`id`)
+  )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -64,10 +76,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`scene` (
   INDEX `chapter_id_idx` (`chapter_id` ASC) VISIBLE,
   CONSTRAINT `fk_scene_chapter`
     FOREIGN KEY (`chapter_id`)
-    REFERENCES `choose_your_fate`.`chapter` (`id`))
+    REFERENCES `choose_your_fate`.`chapter` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`character_avatar`
@@ -96,10 +108,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`character_avatar` (
     REFERENCES `choose_your_fate`.`race_details` (`id`),
   CONSTRAINT `fk_scene_character_avatar`
     FOREIGN KEY (`scene_id`)
-    REFERENCES `choose_your_fate`.`scene` (`id`))
+    REFERENCES `choose_your_fate`.`scene` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`character_details`
@@ -112,10 +124,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`character_details` (
   PRIMARY KEY (`character_id`),
   CONSTRAINT `fk_character_details_character`
     FOREIGN KEY (`character_id`)
-    REFERENCES `choose_your_fate`.`character_avatar` (`id`))
+    REFERENCES `choose_your_fate`.`character_avatar` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`quest`
@@ -128,10 +140,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`quest` (
   INDEX `scene_id_idx` (`scene_id` ASC) VISIBLE,
   CONSTRAINT `fk_quest_scene`
     FOREIGN KEY (`scene_id`)
-    REFERENCES `choose_your_fate`.`scene` (`id`))
+    REFERENCES `choose_your_fate`.`scene` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`character_has_quest`
@@ -147,10 +159,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`character_has_quest` (
     REFERENCES `choose_your_fate`.`character_avatar` (`id`),
   CONSTRAINT `fk_character_has_quest_quest`
     FOREIGN KEY (`quest_id`)
-    REFERENCES `choose_your_fate`.`quest` (`id`))
+    REFERENCES `choose_your_fate`.`quest` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`character_path`
@@ -163,10 +175,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`character_path` (
   INDEX `character_id_idx` (`character_id` ASC) VISIBLE,
   CONSTRAINT `fk_character_path_character`
     FOREIGN KEY (`character_id`)
-    REFERENCES `choose_your_fate`.`character_avatar` (`id`))
+    REFERENCES `choose_your_fate`.`character_avatar` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`choice`
@@ -189,10 +201,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`choice` (
     REFERENCES `choose_your_fate`.`scene` (`id`),
   CONSTRAINT `fk_choice_scene`
     FOREIGN KEY (`scene_id`)
-    REFERENCES `choose_your_fate`.`scene` (`id`))
+    REFERENCES `choose_your_fate`.`scene` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`character_path_choice`
@@ -207,10 +219,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`character_path_choice` (
     REFERENCES `choose_your_fate`.`character_path` (`id`),
   CONSTRAINT `fk_character_path_choice_choice`
     FOREIGN KEY (`choice_id`)
-    REFERENCES `choose_your_fate`.`choice` (`id`))
+    REFERENCES `choose_your_fate`.`choice` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`item`
@@ -220,10 +232,11 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`item` (
   `name` VARCHAR(45) NULL DEFAULT NULL,
   `description` TEXT NULL DEFAULT NULL,
   `type` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `idx_item_type` (`type` ASC) VISIBLE
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`equipment`
@@ -249,10 +262,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`equipment` (
     REFERENCES `choose_your_fate`.`item` (`id`),
   CONSTRAINT `fk_equipment_legs`
     FOREIGN KEY (`legs`)
-    REFERENCES `choose_your_fate`.`item` (`id`))
+    REFERENCES `choose_your_fate`.`item` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`inventory`
@@ -264,10 +277,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`inventory` (
   INDEX `fk_inventory_character1_idx` (`character_id` ASC) VISIBLE,
   CONSTRAINT `fk_inventory_character`
     FOREIGN KEY (`character_id`)
-    REFERENCES `choose_your_fate`.`character_avatar` (`id`))
+    REFERENCES `choose_your_fate`.`character_avatar` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`inventory_has_item`
@@ -284,10 +297,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`inventory_has_item` (
     REFERENCES `choose_your_fate`.`inventory` (`id`),
   CONSTRAINT `fk_inventory_has_item_item`
     FOREIGN KEY (`item_id`)
-    REFERENCES `choose_your_fate`.`item` (`id`))
+    REFERENCES `choose_your_fate`.`item` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`npc`
@@ -300,10 +313,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`npc` (
   INDEX `fk_race_details_idx` (`race_details_id` ASC) VISIBLE,
   CONSTRAINT `fk_npc_race_details`
     FOREIGN KEY (`race_details_id`)
-    REFERENCES `choose_your_fate`.`race_details` (`id`))
+    REFERENCES `choose_your_fate`.`race_details` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`quest_has_item`
@@ -319,10 +332,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`quest_has_item` (
     REFERENCES `choose_your_fate`.`item` (`id`),
   CONSTRAINT `fk_quest_has_item_quest`
     FOREIGN KEY (`quest_id`)
-    REFERENCES `choose_your_fate`.`quest` (`id`))
+    REFERENCES `choose_your_fate`.`quest` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`scene_has_npc`
@@ -338,10 +351,10 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`scene_has_npc` (
     REFERENCES `choose_your_fate`.`npc` (`id`),
   CONSTRAINT `fk_scene_has_npc_scene`
     FOREIGN KEY (`scene_id`)
-    REFERENCES `choose_your_fate`.`scene` (`id`))
+    REFERENCES `choose_your_fate`.`scene` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
 
 -- -----------------------------------------------------
 -- Table `choose_your_fate`.`choice_has_item`

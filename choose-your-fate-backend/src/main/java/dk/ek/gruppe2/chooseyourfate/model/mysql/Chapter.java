@@ -3,6 +3,7 @@ package dk.ek.gruppe2.chooseyourfate.model.mysql;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "chapter")
@@ -21,6 +22,10 @@ public class Chapter {
     @OneToMany(mappedBy = "chapter")
     private List<CharacterAvatar> characters = new ArrayList<>();
 
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "starting_scene_id", nullable = true)
+    private Scene startingScene;
+
     public Chapter() {}
 
     public Integer getId() { return id; }
@@ -34,4 +39,8 @@ public class Chapter {
 
     public List<CharacterAvatar> getCharacters() { return characters; }
     public void setCharacters(List<CharacterAvatar> characters) { this.characters = characters; }
+
+    public Scene getStartingScene() { return startingScene; }
+
+    public void setStartingScene(Scene startingScene) { this.startingScene = startingScene; }
 }

@@ -1,0 +1,403 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema defaultdb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema defaultdb
+-- -----------------------------------------------------
+USE `defaultdb` ;
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`account`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`account` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(50) NOT NULL UNIQUE,
+  `character_limit` INT NOT NULL,
+  `email` VARCHAR(100) NOT NULL UNIQUE,
+  `password` VARCHAR(100) NOT NULL,
+  `role` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`chapter`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`chapter` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  `starting_scene_id` INT NULL, -- Has to not be NOT NULL, since it otherwise creates a loop with scenes table which needs a chapter to be created
+  PRIMARY KEY (`id`),
+  INDEX `starting_scene_idx` (`starting_scene_id` ASC) VISIBLE,
+  CONSTRAINT `fk_starting_scene_chapter`
+    FOREIGN KEY (`starting_scene_id`)
+    REFERENCES `defaultdb`.`scene` (`id`)
+  )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`race_details`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`race_details` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'BOB rules them all!',
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  `starting_chapter_id` INT NOT NULL, -- needed to determine where the character starts on creating new character
+  PRIMARY KEY (`id`),
+  INDEX `starting_chapter_idx` (`starting_chapter_id` ASC) VISIBLE,
+  CONSTRAINT `fk_starting_chapter_race_details`
+    FOREIGN KEY (`starting_chapter_id`)
+    REFERENCES `defaultdb`.`chapter` (`id`)
+  )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`scene`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`scene` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `chapter_id` INT NOT NULL,
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `chapter_id_idx` (`chapter_id` ASC) VISIBLE,
+  CONSTRAINT `fk_scene_chapter`
+    FOREIGN KEY (`chapter_id`)
+    REFERENCES `defaultdb`.`chapter` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`character_avatar`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`character_avatar` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `account_id` INT NOT NULL,
+  `chapter_id` INT NOT NULL,
+  `scene_id` INT NOT NULL,
+  `race_detail_id` INT NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
+  `flag` JSON NOT NULL COMMENT 'Lost/gain of rep, debuff/buff, BOB?... etc',
+  PRIMARY KEY (`id`),
+  INDEX `player_id_idx` (`account_id` ASC) VISIBLE,
+  INDEX `chapter_id_idx` (`chapter_id` ASC) VISIBLE,
+  INDEX `scene_id_idx` (`scene_id` ASC) VISIBLE,
+  INDEX `race_detail_id_idx` (`race_detail_id` ASC) VISIBLE,
+  CONSTRAINT `fk_chapter_character_avatar`
+    FOREIGN KEY (`chapter_id`)
+    REFERENCES `defaultdb`.`chapter` (`id`),
+  CONSTRAINT `fk_player_character_avatar`
+    FOREIGN KEY (`account_id`)
+    REFERENCES `defaultdb`.`account` (`id`),
+  CONSTRAINT `fk_race_detail_character_avatar`
+    FOREIGN KEY (`race_detail_id`)
+    REFERENCES `defaultdb`.`race_details` (`id`),
+  CONSTRAINT `fk_scene_character_avatar`
+    FOREIGN KEY (`scene_id`)
+    REFERENCES `defaultdb`.`scene` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`character_details`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`character_details` (
+  `character_id` INT NOT NULL,
+  `intelligence` INT NULL DEFAULT NULL,
+  `charisma` INT NULL DEFAULT NULL,
+  `fashion` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`character_id`),
+  CONSTRAINT `fk_character_details_character`
+    FOREIGN KEY (`character_id`)
+    REFERENCES `defaultdb`.`character_avatar` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`quest`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`quest` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `scene_id` INT NOT NULL,
+  `description` MEDIUMTEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `scene_id_idx` (`scene_id` ASC) VISIBLE,
+  CONSTRAINT `fk_quest_scene`
+    FOREIGN KEY (`scene_id`)
+    REFERENCES `defaultdb`.`scene` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`character_has_quest`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`character_has_quest` (
+  `character_id` INT NOT NULL,
+  `quest_id` INT NOT NULL,
+  `status` TINYINT NOT NULL,
+  PRIMARY KEY (`character_id`, `quest_id`),
+  INDEX `quest_id_idx` (`quest_id` ASC) VISIBLE,
+  CONSTRAINT `fk_character_has_quest_character`
+    FOREIGN KEY (`character_id`)
+    REFERENCES `defaultdb`.`character_avatar` (`id`),
+  CONSTRAINT `fk_character_has_quest_quest`
+    FOREIGN KEY (`quest_id`)
+    REFERENCES `defaultdb`.`quest` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`character_path`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`character_path` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `character_id` INT NOT NULL,
+  `summary` LONGTEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `character_id_idx` (`character_id` ASC) VISIBLE,
+  CONSTRAINT `fk_character_path_character`
+    FOREIGN KEY (`character_id`)
+    REFERENCES `defaultdb`.`character_avatar` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`choice`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`choice` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `scene_id` INT NOT NULL,
+  `destination_scene_id` INT NULL DEFAULT NULL,
+  `description` MEDIUMTEXT NULL DEFAULT NULL,
+  `consequence` VARCHAR(50) NULL,
+  `target_id` INT NULL COMMENT 'Give quest, give item(s)... etc',
+  `value_int` INT NULL COMMENT 'Stat change, lose hp, fashion!!!... etc\n\n\n\n\nze BOB race!',
+  `story_weight` SMALLINT(255) NOT NULL COMMENT 'Value/weight of the recap or story telling for the AI to use.',
+  `requirements` JSON NULL COMMENT 'Requirements is what gives or takes away choices/ quests because you either meet the requirements or don\'t.',
+  PRIMARY KEY (`id`),
+  INDEX `scene_id_idx` (`scene_id` ASC) VISIBLE,
+  INDEX `fk_choice_destination_scene_idx` (`destination_scene_id` ASC) VISIBLE,
+  CONSTRAINT `fk_choice_destination_scene`
+    FOREIGN KEY (`destination_scene_id`)
+    REFERENCES `defaultdb`.`scene` (`id`),
+  CONSTRAINT `fk_choice_scene`
+    FOREIGN KEY (`scene_id`)
+    REFERENCES `defaultdb`.`scene` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`character_path_choice`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`character_path_choice` (
+  `character_path_id` INT NOT NULL,
+  `choice_id` INT NOT NULL,
+  PRIMARY KEY (`character_path_id`, `choice_id`),
+  INDEX `choice_id_idx` (`choice_id` ASC) VISIBLE,
+  CONSTRAINT `fk_character_path_choice_character_path`
+    FOREIGN KEY (`character_path_id`)
+    REFERENCES `defaultdb`.`character_path` (`id`),
+  CONSTRAINT `fk_character_path_choice_choice`
+    FOREIGN KEY (`choice_id`)
+    REFERENCES `defaultdb`.`choice` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`item`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`item` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NULL DEFAULT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `type` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_item_type` (`type` ASC) VISIBLE
+  )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`equipment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`equipment` (
+  `character_id` INT NOT NULL,
+  `head` INT NULL DEFAULT NULL,
+  `legs` INT NULL DEFAULT NULL,
+  `chest` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`character_id`),
+  INDEX `fk_equipment_character1_idx` (`character_id` ASC) VISIBLE,
+  INDEX `fk_equipment_item_idx` (`head` ASC) VISIBLE,
+  INDEX `fk_equipment_chest_idx` (`chest` ASC) VISIBLE,
+  INDEX `fk_equipment_legs_idx` (`legs` ASC) VISIBLE,
+  CONSTRAINT `fk_equipment_character`
+    FOREIGN KEY (`character_id`)
+    REFERENCES `defaultdb`.`character_avatar` (`id`),
+  CONSTRAINT `fk_equipment_chest`
+    FOREIGN KEY (`chest`)
+    REFERENCES `defaultdb`.`item` (`id`),
+  CONSTRAINT `fk_equipment_head`
+    FOREIGN KEY (`head`)
+    REFERENCES `defaultdb`.`item` (`id`),
+  CONSTRAINT `fk_equipment_legs`
+    FOREIGN KEY (`legs`)
+    REFERENCES `defaultdb`.`item` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`inventory`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`inventory` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `character_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_inventory_character1_idx` (`character_id` ASC) VISIBLE,
+  CONSTRAINT `fk_inventory_character`
+    FOREIGN KEY (`character_id`)
+    REFERENCES `defaultdb`.`character_avatar` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`inventory_has_item`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`inventory_has_item` (
+  `item_id` INT NOT NULL,
+  `inventory_id` INT NOT NULL,
+  `amount` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`item_id`, `inventory_id`),
+  INDEX `fk_item_has_inventory_inventory1_idx` (`inventory_id` ASC) VISIBLE,
+  INDEX `fk_item_has_inventory_item1_idx` (`item_id` ASC) VISIBLE,
+  CONSTRAINT `fk_inventory_has_item_inventory`
+    FOREIGN KEY (`inventory_id`)
+    REFERENCES `defaultdb`.`inventory` (`id`),
+  CONSTRAINT `fk_inventory_has_item_item`
+    FOREIGN KEY (`item_id`)
+    REFERENCES `defaultdb`.`item` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`npc`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`npc` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `race_details_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_race_details_idx` (`race_details_id` ASC) VISIBLE,
+  CONSTRAINT `fk_npc_race_details`
+    FOREIGN KEY (`race_details_id`)
+    REFERENCES `defaultdb`.`race_details` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`quest_has_item`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`quest_has_item` (
+  `quest_id` INT NOT NULL,
+  `item_id` INT NOT NULL,
+  PRIMARY KEY (`quest_id`, `item_id`),
+  INDEX `fk_quest_has_item_item1_idx` (`item_id` ASC) VISIBLE,
+  INDEX `fk_quest_has_item_quest1_idx` (`quest_id` ASC) VISIBLE,
+  CONSTRAINT `fk_quest_has_item_item`
+    FOREIGN KEY (`item_id`)
+    REFERENCES `defaultdb`.`item` (`id`),
+  CONSTRAINT `fk_quest_has_item_quest`
+    FOREIGN KEY (`quest_id`)
+    REFERENCES `defaultdb`.`quest` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`scene_has_npc`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`scene_has_npc` (
+  `scene_id` INT NOT NULL,
+  `npc_id` INT NOT NULL,
+  PRIMARY KEY (`scene_id`, `npc_id`),
+  INDEX `fk_scene_has_npc_npc1_idx` (`npc_id` ASC) VISIBLE,
+  INDEX `fk_scene_has_npc_scene1_idx` (`scene_id` ASC) VISIBLE,
+  CONSTRAINT `fk_scene_has_npc_npc`
+    FOREIGN KEY (`npc_id`)
+    REFERENCES `defaultdb`.`npc` (`id`),
+  CONSTRAINT `fk_scene_has_npc_scene`
+    FOREIGN KEY (`scene_id`)
+    REFERENCES `defaultdb`.`scene` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `defaultdb`.`choice_has_item`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`choice_has_item` (
+  `choice_id` INT NOT NULL,
+  `item_id` INT NOT NULL,
+  PRIMARY KEY (`choice_id`, `item_id`),
+  INDEX `fk_choice_has_item_item1_idx` (`item_id` ASC) VISIBLE,
+  INDEX `fk_choice_has_item_choice1_idx` (`choice_id` ASC) VISIBLE,
+  CONSTRAINT `fk_choice_has_item_choice1`
+    FOREIGN KEY (`choice_id`)
+    REFERENCES `defaultdb`.`choice` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_choice_has_item_item1`
+    FOREIGN KEY (`item_id`)
+    REFERENCES `defaultdb`.`item` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+USE `defaultdb` ;
+
+-- -----------------------------------------------------
+-- Placeholder table for view `defaultdb`.`v_character`
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- View `defaultdb`.`v_character`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `defaultdb`.`v_character`;
+USE `defaultdb`;
+CREATE  OR REPLACE VIEW `v_character` AS (
+    SELECT avatar.name, deets.intelligence, deets.charisma, deets.fashion, avatar.flag
+    FROM character_details deets
+    JOIN character_avatar avatar
+      ON deets.character_id = avatar.id
+        );
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+

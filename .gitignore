@@ -41,3 +41,7 @@ Mandatory-one-database/.obsidian/
 # generated database dumps
 database_backups/*.sql
 
+# local environment files
+.env
+**/.env
+

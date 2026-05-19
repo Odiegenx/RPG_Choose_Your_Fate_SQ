@@ -1,10 +1,15 @@
 package dk.ek.gruppe2.chooseyourfate.dto;
 
-public class CreateCharacterRequestDTO {
+import jakarta.validation.constraints.NotNull;
 
+public class CreateCharacterRequestDTO {
+    @NotNull(message = "accountId is required")
     private Integer accountId;
+
     private Integer chapterId;
     private Integer sceneId;
+    
+    @NotNull(message = "race details id is required")
     private Integer raceDetailsId;
     private String name;
 

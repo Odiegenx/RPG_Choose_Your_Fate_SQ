@@ -6,9 +6,7 @@ import dk.ek.gruppe2.chooseyourfate.dto.CreateAccountRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.UpdateAccountRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.interfaces.AccountDataAccess;
-import dk.ek.gruppe2.chooseyourfate.service.mongodb.MongoAccountService;
 import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlAccountService;
-import dk.ek.gruppe2.chooseyourfate.service.neo4j.Neo4jAccountService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,19 +16,13 @@ public class AccountService {
 
     private final DataSourceResolver dataSourceResolver;
     private final SqlAccountService sqlAccountService;
-    private final Neo4jAccountService neo4jAccountService;
-    private final MongoAccountService mongoAccountService;
 
     public AccountService(
             DataSourceResolver dataSourceResolver,
-            SqlAccountService sqlAccountService,
-            Neo4jAccountService neo4jAccountService,
-            MongoAccountService mongoAccountService
+            SqlAccountService sqlAccountService
     ) {
         this.dataSourceResolver = dataSourceResolver;
         this.sqlAccountService = sqlAccountService;
-        this.neo4jAccountService = neo4jAccountService;
-        this.mongoAccountService = mongoAccountService;
     }
 
     public List<AccountResponseDTO> getAllAccounts(String sourceHeader) {
@@ -61,8 +53,6 @@ public class AccountService {
         DataSourceType dataSourceType = dataSourceResolver.resolve(sourceHeader);
         return switch (dataSourceType) {
             case SQL -> sqlAccountService;
-            case NEO4J -> neo4jAccountService;
-            case MONGODB -> mongoAccountService;
         };
     }
 }

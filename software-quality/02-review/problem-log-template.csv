@@ -1,11 +1,11 @@
 No.;Page/line;Defect category;Severity;Defect type;Description/comments
-1;;;;;
-2;;;;;
-3;;;;;
-4;;;;;
-5;;;;;
-6;;;;;
-7;;;;;
-8;;;;;
-9;;;;;
-10;;;;;
+1;Sec. 1.1;Defect;Medium;Clarity;Problem statement is understandable, but it should be phrased more precisely. "These kinds of games do not exist" is too absolute and should be softened to something like "there are relatively few browser-based choice-driven text RPGs".
+2;Sec. 1.3;Missing;High;Completeness;The scope says multiple adventures are out of scope, but it does not explicitly state whether the delivered system must support exactly one complete adventure or only a vertical slice of one adventure. This should be clarified.
+3;Sec. 2.1;Defect;Medium;Consistency;The SRS states that non-relational persistence is out of scope for the Software Quality version, but the technology section should also consistently reflect that only the relational architecture is part of this version.
+4;Sec. 4.1;Missing;High;Testability;Account registration is mentioned, but acceptance criteria are not defined. The requirement should specify what fields are mandatory and what conditions make account creation fail.
+5;Sec. 4.3;Missing;High;Completeness;Scene navigation is described, but the SRS does not explicitly state how the system determines the next scene from a selected choice.
+6;Sec. 4.5;Defect;Low;Scope;Inventory, items, and quests are listed as requirements, but the wording should make clearer whether they are mandatory in the final slice or optional if time allows.
+7;Sec. 5.1;Missing;Medium;Testability;Availability is emphasized, but the SRS does not define what "high availability" means in the project context or how success will be evaluated during testing.
+8;Sec. 5.2;Missing;Medium;Completeness;The SRS mentions a mirrored SQL server, but it does not describe whether failover is manual, semi-automatic, or automatic. This affects both design and testing.
+9;Sec. 5.6;Defect;Medium;Consistency;The SRS requires Playwright for end-to-end testing, but it could also mention that the course requires API tests and CI to execute automated checks, so the testing requirements are grouped more clearly.
+10;Sec. 9;Suggestion;Low;Structure;The open decisions section is useful, but some of the unresolved points should ideally be resolved before the final reviewed version of the SRS is approved.

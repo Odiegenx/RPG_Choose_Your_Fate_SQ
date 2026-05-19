@@ -42,21 +42,26 @@ INSERT INTO account (id, username, character_limit, email, password, role) VALUE
     (3, 'cora', 2, 'cora@chooseyourfate.dk', '$2b$10$iZ9YNxMMbTNypAe9bbc9iO2Gx6Vry//6EvkvaqzoaOQeZkslRQl42', 'ROLE_USER'),
     (4, 'admin', 5, 'admin@chooseyourfate.dk', '$2b$10$oRncOoF8dWCtNtBanr/NxOVzSrK5ZxyHZthp9CIzo44W3fKgS..sK', 'ROLE_ADMIN');
 
-INSERT INTO chapter (id, name) VALUES
-    (1, 'The Festival Gate'),
-    (2, 'Moonlit Ruins');
+INSERT INTO chapter (id, name, starting_scene_id) VALUES
+    (1, 'The Festival Gate', NULL),
+    (2, 'Moonlit Ruins', NULL),
+    (3, 'bobs playground', NULL),
+    (4, 'Tall forest, small people', NULL),
+    (5, 'Small forest, tall people', NULL);
 
-INSERT INTO race_details (id) VALUES
-    (1),
-    (2),
-    (3);
+INSERT INTO race_details (id, name, starting_chapter_id) VALUES
+    (1, 'Bobs', 3),
+    (2, 'Bobiticus laviticus', 3),
+    (3, 'smalls', 4),
+    (4, 'TALLS', 5),
+    (5, 'MeDiUmS', 2);
 
 INSERT INTO scene (id, chapter_id, name) VALUES
     (1, 1, 'Town Gate'),
-    (2, 1, 'Market Square'),
-    (3, 1, 'Watchtower'),
-    (4, 2, 'Forest Path'),
-    (5, 2, 'Moon Shrine');
+    (2, 2, 'Market Square'),
+    (3, 3, 'Watchtower'),
+    (4, 4, 'Forest Path'),
+    (5, 5, 'Moon Shrine');
 
 INSERT INTO item (id, name, description, type) VALUES
     (1, 'Rusty Sword', 'Old sword, still sharp enough for fights.', 'weapon'),
@@ -158,6 +163,26 @@ ON DUPLICATE KEY UPDATE amount = VALUES(amount);
 UPDATE equipment
 SET head = 2, chest = 3, legs = 4
 WHERE character_id = 3;
+
+UPDATE chapter
+SET starting_scene_id = 1
+WHERE id = 1;
+
+UPDATE chapter
+SET starting_scene_id = 2
+WHERE id = 2;
+
+UPDATE chapter
+SET starting_scene_id = 3
+WHERE id = 3;
+
+UPDATE chapter
+SET starting_scene_id = 4
+WHERE id = 4;
+
+UPDATE chapter
+SET starting_scene_id = 5
+WHERE id = 5;
 
 CALL sp_make_choice(1, 1);
 CALL sp_make_choice(1, 3);

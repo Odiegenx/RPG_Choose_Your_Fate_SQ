@@ -1,0 +1,28 @@
+.margin-top-bot-10 {
+    margin: 10px 0px;
+}
+
+.margin-left-5 {
+    margin-left: 5px;
+}
+
+.character-detail-grid-container-column {
+    display: grid;
+    grid-auto-flow: column dense;
+    grid-template-columns: 30vw 15vw;
+}
+
+.character-detail-grid-container-row {
+    display: grid;
+    grid-auto-flow: row dense;
+    grid-template-rows: 50% 50%;
+}
+
+.padding-right-20 {
+    padding-right: 20px;
+}
+
+#vw-character-details {
+    min-width: 45vw;
+    min-height: 92vh;
+}

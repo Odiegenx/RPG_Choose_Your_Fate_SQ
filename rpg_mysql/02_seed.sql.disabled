@@ -7,7 +7,7 @@ SET FOREIGN_KEY_CHECKS=0;
 USE choose_your_fate;
 
 -- Race Details
-INSERT INTO race_details (id) VALUES (1), (2), (3);
+INSERT INTO race_details (id) VALUES (1), (2), (3), (4), (5);
 
 -- Accounts
 INSERT INTO account (username, password, email, character_limit, role) VALUES

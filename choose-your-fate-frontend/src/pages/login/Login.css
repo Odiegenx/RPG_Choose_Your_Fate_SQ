@@ -1,0 +1,28 @@
+.center-content {
+    height: 100%;
+    width: auto;
+    place-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.button-placement {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: space-between;
+}
+
+.login-container {
+    width: 30%;
+    justify-content: center;
+}
+
+.login-container input {
+    width: stretch;
+    max-width: stretch;
+}
+
+h1 {
+    text-align: center;
+}

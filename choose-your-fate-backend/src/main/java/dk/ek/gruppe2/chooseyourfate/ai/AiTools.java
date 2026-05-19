@@ -102,4 +102,5 @@ public class AiTools {
         characterPathService.updateCharacterPath(characterId, request);
         return "Summary saved successfully for character " + characterId;
     }
+
 }

@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableMethodSecurity
@@ -24,14 +24,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(csrf -> csrf.disable()).
-            cors(cors ->  cors.configurationSource(request -> {
-                CorsConfiguration config = new CorsConfiguration();
-                config.addAllowedOrigin("*");
-                config.addAllowedHeader("*");
-                config.addAllowedMethod("*");
-                return config;
-            })).sessionManagement(session ->
+            .cors(withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
@@ -42,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/choose-your-fate/chapter/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/choose-your-fate/scene/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/choose-your-fate/choice/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/choose-your-fate/characters/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/choose-your-fate/inventories/**").authenticated()
                 .requestMatchers("/choose-your-fate/tts/test").permitAll()
                 .anyRequest().authenticated()

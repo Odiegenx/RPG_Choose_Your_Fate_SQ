@@ -19,7 +19,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Choose Your Fate API")
                         .version("1.0")
-                        .description("Backend API for MySQL, Neo4j, and MongoDB-backed endpoints"))
+                        .description("Backend API for SQL-backed endpoints"))
                 .addSecurityItem(new SecurityRequirement().addList(BEARER_SCHEME))
                 .components(new Components()
                         .addSecuritySchemes(BEARER_SCHEME, new SecurityScheme()
