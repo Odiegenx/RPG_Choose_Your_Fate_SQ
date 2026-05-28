@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/ai")
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AiController {
 
     private final AiService aiService;
-
     public AiController(AiService aiService) {
         this.aiService = aiService;
     }
@@ -32,4 +28,5 @@ public class AiController {
     public AiResponseDTO ask(@Valid @RequestBody AiRequestDTO request) {
         return new AiResponseDTO(aiService.handleRequest(request));
     }
+
 }

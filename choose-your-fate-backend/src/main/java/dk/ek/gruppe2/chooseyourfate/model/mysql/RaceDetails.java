@@ -1,6 +1,8 @@
 package dk.ek.gruppe2.chooseyourfate.model.mysql;
 
 import jakarta.persistence.*;
+import org.jspecify.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ public class RaceDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Nullable
     private String name;
 
     @OneToMany(mappedBy = "raceDetails")

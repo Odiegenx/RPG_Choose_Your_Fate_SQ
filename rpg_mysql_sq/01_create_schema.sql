@@ -33,6 +33,26 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
 -- -----------------------------------------------------
+-- Table `choose_your_fate`.`audit_log`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `choose_your_fate`.`audit_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `table_name` VARCHAR(100) NOT NULL,
+  `entity_id` VARCHAR(100) NOT NULL,
+  `action_type` VARCHAR(20) NOT NULL,
+  `database_user` VARCHAR(100) NOT NULL,
+  `changed_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `old_data` JSON NULL,
+  `new_data` JSON NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_audit_log_table_name` (`table_name` ASC) VISIBLE,
+  INDEX `idx_audit_log_entity_id` (`entity_id` ASC) VISIBLE,
+  INDEX `idx_audit_log_changed_at` (`changed_at` ASC) VISIBLE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+-- -----------------------------------------------------
 -- Table `choose_your_fate`.`chapter`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `choose_your_fate`.`chapter` (
@@ -171,6 +191,9 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`character_path` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `character_id` INT NOT NULL,
   `summary` LONGTEXT NULL DEFAULT NULL,
+  `audio_blob` mediumblob,
+  `summary_updated_at` datetime DEFAULT NULL,
+  `audio_blob_updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `character_id_idx` (`character_id` ASC) VISIBLE,
   CONSTRAINT `fk_character_path_character`
@@ -192,7 +215,7 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`choice` (
   `target_id` INT NULL COMMENT 'Give quest, give item(s)... etc',
   `value_int` INT NULL COMMENT 'Stat change, lose hp, fashion!!!... etc\n\n\n\n\nze BOB race!',
   `story_weight` SMALLINT(255) NOT NULL COMMENT 'Value/weight of the recap or story telling for the AI to use.',
-  `requirements` JSON NULL COMMENT 'Requirements is what gives or takes away choices/ quests because you either meet the requirements or don\'t.',
+  `requirements` JSON NULL COMMENT 'Requirements is what gives or takes away choices/ quests because you either meet the requirements or dont',
   PRIMARY KEY (`id`),
   INDEX `scene_id_idx` (`scene_id` ASC) VISIBLE,
   INDEX `fk_choice_destination_scene_idx` (`destination_scene_id` ASC) VISIBLE,
@@ -378,21 +401,18 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`choice_has_item` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
-USE `choose_your_fate` ;
-
--- -----------------------------------------------------
--- Placeholder table for view `choose_your_fate`.`v_character`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `choose_your_fate`.`v_character` (`id` INT);
+USE `choose_your_fate`;
 
 -- -----------------------------------------------------
 -- View `choose_your_fate`.`v_character`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `choose_your_fate`.`v_character`;
+DROP VIEW IF EXISTS `choose_your_fate`.`v_character`;
 USE `choose_your_fate`;
 CREATE  OR REPLACE VIEW `v_character` AS (
     SELECT avatar.name, deets.intelligence, deets.charisma, deets.fashion, avatar.flag
-    FROM character_details deets, character_avatar avatar
+    FROM character_details deets
+    JOIN character_avatar avatar
+      ON deets.character_id = avatar.id
         );
 
 SET SQL_MODE=@OLD_SQL_MODE;

@@ -44,4 +44,6 @@ database_backups/*.sql
 # local environment files
 .env
 **/.env
+**/.env.**
 
+.env.bak

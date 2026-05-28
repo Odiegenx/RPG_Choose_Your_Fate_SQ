@@ -3,9 +3,9 @@ package dk.ek.gruppe2.chooseyourfate.dto.choice;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Choice;
 
 public class ChoiceResponseDTO {
-    private Integer id;
-    private Integer destinationSceneId;
-    private Integer sceneId;
+    private String id;
+    private String destinationSceneId;
+    private String sceneId;
     private String description;
     private String consequence;
     private Integer targetId;
@@ -13,7 +13,7 @@ public class ChoiceResponseDTO {
     private String requirements;
 
 
-    public ChoiceResponseDTO(Integer id, Integer destinationSceneId, Integer sceneId, String description,
+    public ChoiceResponseDTO(String id, String destinationSceneId, String sceneId, String description,
             String consequence, Integer targetId, Integer valueInt, String requirements) {
         this.id = id;
         this.destinationSceneId = destinationSceneId;
@@ -26,10 +26,10 @@ public class ChoiceResponseDTO {
     }
 
     public ChoiceResponseDTO(Choice choice) {
-        this.id = choice.getId();
+        this.id = choice.getId().toString();
         this.description = choice.getDescription();
-        this.destinationSceneId = choice.getDestinationScene().getId();
-        this.sceneId = choice.getScene().getId();
+        this.destinationSceneId = choice.getDestinationScene().getId().toString();
+        this.sceneId = choice.getScene().getId().toString();
         this.consequence = choice.getConsequence();
         this.targetId = choice.getTargetId();
         this.valueInt = choice.getValueInt();
@@ -38,9 +38,9 @@ public class ChoiceResponseDTO {
 
     public ChoiceResponseDTO toDTO(Choice choice) {
         return new ChoiceResponseDTO(
-                choice.getId(),
-                choice.getDestinationScene().getId(),
-                choice.getScene().getId(),
+                choice.getId().toString(),
+                choice.getDestinationScene().getId().toString(),
+                choice.getScene().getId().toString(),
                 choice.getDescription(),
                 choice.getConsequence(),
                 choice.getTargetId(),
@@ -49,11 +49,11 @@ public class ChoiceResponseDTO {
         );
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -65,11 +65,11 @@ public class ChoiceResponseDTO {
         this.description = description;
     }
 
-    public Integer getDestinationSceneId() {
+    public String getDestinationSceneId() {
         return destinationSceneId;
     }
 
-    public void setDestinationSceneId(Integer destinationSceneId) {
+    public void setDestinationSceneId(String destinationSceneId) {
         this.destinationSceneId = destinationSceneId;
     }
 
@@ -106,11 +106,13 @@ public class ChoiceResponseDTO {
         this.requirements = requirements;
     }
 
-    public Integer getSceneId() {
+    public String getSceneId() {
         return sceneId;
     }
 
-    public void setSceneId(Integer sceneId) {
+    public void setSceneId(String sceneId) {
         this.sceneId = sceneId;
     }
+
+
 }

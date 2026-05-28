@@ -70,7 +70,10 @@ INSERT INTO item (id, name, description, type) VALUES
     (4, 'Traveler Pants', 'Sturdy pants with useful pockets.', 'armor_legs'),
     (5, 'Healing Potion', 'Restores strength and confidence.', 'consumable'),
     (6, 'Moon Key', 'Silver key etched with moon symbols.', 'quest'),
-    (7, 'Festival Token', 'Brass token used for festival entry.', 'quest');
+    (7, 'Festival Token', 'Brass token used for festival entry.', 'quest'),
+    (8, 'Iron Helmet', 'Sturdy helmet forged by a city blacksmith.', 'armor_head'),
+    (9, 'Chain Vest', 'Interlocked rings offer decent protection.', 'armor_chest'),
+    (10, 'Iron Greaves', 'Heavy leg armor slowing your movement slightly.', 'armor_legs');
 
 INSERT INTO npc (id, name, race_details_id) VALUES
     (1, 'Captain Elira', 1),
@@ -107,7 +110,7 @@ INSERT INTO choice_has_item (choice_id, item_id) VALUES
 INSERT INTO character_avatar (id, account_id, chapter_id, scene_id, race_detail_id, name, flag) VALUES
     (1, 1, 1, 1, 1, 'Lyra', '{"reputation":{"guard":1},"statusEffects":[],"storyFlags":["festival-access"]}'),
     (2, 2, 1, 1, 2, 'Torben', '{"reputation":{"market":0},"statusEffects":[],"storyFlags":["watchtower-visited"]}'),
-    (3, 3, 2, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}');
+    (3, 3, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}');
 
 UPDATE character_details
 SET intelligence = 7, charisma = 6, fashion = 5
@@ -157,7 +160,10 @@ INSERT INTO inventory_has_item (item_id, inventory_id, amount) VALUES
     (5, 1, 2),
     (2, 2, 1),
     (3, 3, 1),
-    (4, 3, 1)
+    (4, 3, 1),
+    (8, 3, 1),
+    (9, 3, 1),
+    (10, 3, 1)
 ON DUPLICATE KEY UPDATE amount = VALUES(amount);
 
 UPDATE equipment

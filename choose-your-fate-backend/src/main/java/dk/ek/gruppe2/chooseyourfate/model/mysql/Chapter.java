@@ -3,7 +3,6 @@ package dk.ek.gruppe2.chooseyourfate.model.mysql;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Table(name = "chapter")

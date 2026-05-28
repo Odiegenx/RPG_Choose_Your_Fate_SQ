@@ -2,6 +2,7 @@ package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.ItemRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.ItemResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.interfaces.ItemDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.ItemRepository;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class ItemService {
         return response;
     }
 
-    public ItemResponseDTO getItemById(Integer id) {
+    public ItemResponseDTO findById(Integer id) {
         Item item = itemRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
         ItemResponseDTO response = new ItemResponseDTO(item);
         return response;
@@ -70,5 +71,4 @@ public class ItemService {
     public ItemResponseDTO toDto(Item item) {
         return new ItemResponseDTO(item);
     }
-
 }
