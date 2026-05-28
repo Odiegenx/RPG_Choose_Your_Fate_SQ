@@ -2,6 +2,7 @@ package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.ItemRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.ItemResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.interfaces.ItemDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.ItemRepository;
 import org.springframework.http.HttpStatus;
@@ -12,11 +13,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class ItemService {
+public class SqlItemService implements ItemDataAccess {
 
     ItemRepository itemRepository;
 
-    public ItemService(ItemRepository itemRepository) {
+    public SqlItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
 
@@ -26,7 +27,7 @@ public class ItemService {
         return response;
     }
 
-    public ItemResponseDTO getItemById(Integer id) {
+    public ItemResponseDTO findById(Integer id) {
         Item item = itemRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
         ItemResponseDTO response = new ItemResponseDTO(item);
         return response;
@@ -60,14 +61,26 @@ public class ItemService {
     }
 
     public Item toEntity(ItemRequestDTO requestDTO) {
+<<<<<<<< HEAD:choose-your-fate-backend/src/main/java/dk/ek/gruppe2/chooseyourfate/service/ItemService.java
         Item item = new Item();
         item.setName(requestDTO.getName());
         item.setDescription(requestDTO.getDescription());
         item.setType(requestDTO.getType());
         return item;
+========
+            Item item = new Item();
+            item.setName(requestDTO.getName());
+            item.setDescription(requestDTO.getDescription());
+            item.setType(requestDTO.getType());
+            return item;
+>>>>>>>> main:choose-your-fate-backend/src/main/java/dk/ek/gruppe2/chooseyourfate/service/SqlItemService.java
     }
 
     public ItemResponseDTO toDto(Item item) {
         return new ItemResponseDTO(item);
     }
+<<<<<<<< HEAD:choose-your-fate-backend/src/main/java/dk/ek/gruppe2/chooseyourfate/service/ItemService.java
+
+========
+>>>>>>>> main:choose-your-fate-backend/src/main/java/dk/ek/gruppe2/chooseyourfate/service/SqlItemService.java
 }
