@@ -12,7 +12,6 @@ public class UpdateChapterRequestDTO {
     private List<CharacterAvatar> characters;
     private Integer startingSceneId;
     
-    //TODO: Change scenes and characters to sceneIds and characterIds
     public String getName() {
         return name;
     }

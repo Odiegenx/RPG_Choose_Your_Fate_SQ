@@ -1,6 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.model.mysql;
 
 
+import dk.ek.gruppe2.chooseyourfate.enums.ItemType;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,8 +18,7 @@ public class Item {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(length = 45)
-    private String type;
+    private ItemType type;
 
     public Item() {}
 
@@ -31,6 +31,6 @@ public class Item {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public ItemType getType() { return type; }
+    public void setType(ItemType type) { this.type = type; }
 }

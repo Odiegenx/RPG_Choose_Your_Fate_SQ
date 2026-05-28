@@ -30,6 +30,26 @@ CREATE TABLE IF NOT EXISTS `defaultdb`.`account` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
+-- -----------------------------------------------------
+-- Table `defaultdb`.`audit_log`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `defaultdb`.`audit_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `table_name` VARCHAR(100) NOT NULL,
+  `entity_id` VARCHAR(100) NOT NULL,
+  `action_type` VARCHAR(20) NOT NULL,
+  `database_user` VARCHAR(100) NOT NULL,
+  `changed_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `old_data` JSON NULL,
+  `new_data` JSON NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_audit_log_table_name` (`table_name` ASC) VISIBLE,
+  INDEX `idx_audit_log_entity_id` (`entity_id` ASC) VISIBLE,
+  INDEX `idx_audit_log_changed_at` (`changed_at` ASC) VISIBLE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
 
 -- -----------------------------------------------------
 -- Table `defaultdb`.`chapter`
@@ -171,6 +191,9 @@ CREATE TABLE IF NOT EXISTS `defaultdb`.`character_path` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `character_id` INT NOT NULL,
   `summary` LONGTEXT NULL DEFAULT NULL,
+  `audio_blob` mediumblob,
+  `summary_updated_at` datetime DEFAULT NULL,
+  `audio_blob_updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `character_id_idx` (`character_id` ASC) VISIBLE,
   CONSTRAINT `fk_character_path_character`

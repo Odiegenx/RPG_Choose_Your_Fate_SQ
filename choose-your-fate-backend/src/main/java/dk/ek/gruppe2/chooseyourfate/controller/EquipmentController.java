@@ -1,7 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.controller;
 
 import dk.ek.gruppe2.chooseyourfate.dto.EquipmentResponseDTO;
-import dk.ek.gruppe2.chooseyourfate.dto.UpdateEquipmentRequestDTO;
+import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.service.EquipmentService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +12,7 @@ import java.util.List;
 @RequestMapping("/api/equipment")
 public class EquipmentController {
 
+    private static final String DATA_SOURCE_HEADER = "X-Data-Source";
 
     private final EquipmentService equipmentService;
 
@@ -21,23 +22,19 @@ public class EquipmentController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<EquipmentResponseDTO> getAllEquipment() {
-        return equipmentService.getAllEquipment();
+    public List<EquipmentResponseDTO> getAllEquipment(
+            @RequestHeader(value = DATA_SOURCE_HEADER, required = true) DataSourceType dataSource
+    ) {
+        return equipmentService.getAllEquipment(dataSource);
     }
 
     @GetMapping("/{characterId}")
     @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
-    public EquipmentResponseDTO getEquipmentByCharacterId(@PathVariable Integer characterId
+    public EquipmentResponseDTO getEquipmentByCharacterId(
+            @RequestHeader(value = DATA_SOURCE_HEADER, required = true) DataSourceType dataSource,
+            @PathVariable Integer characterId
     ) {
-        return equipmentService.getEquipmentByCharacterId(characterId);
+        return equipmentService.getEquipmentByCharacterId(dataSource, characterId);
     }
 
-    @PutMapping("/{characterId}")
-    @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
-    public EquipmentResponseDTO updateEquipment(
-            @PathVariable Integer characterId,
-            @RequestBody UpdateEquipmentRequestDTO request
-    ) {
-        return equipmentService.updateEquipment(characterId, request);
-    }
 }

@@ -102,7 +102,15 @@ BEGIN
         p_choice_id
     );
     
-    UPDATE `character_avatar` SET scene_id = (SELECT destination_scene_id FROM choice WHERE id = p_choice_id) 
+    UPDATE `character_avatar`
+    SET
+        scene_id = (SELECT destination_scene_id FROM choice WHERE id = p_choice_id),
+        chapter_id = (
+            SELECT s.chapter_id
+            FROM scene s
+            JOIN choice c ON c.destination_scene_id = s.id
+            WHERE c.id = p_choice_id
+        )
     WHERE id = p_character_id;
     
     COMMIT;
@@ -121,4 +129,3 @@ ON DUPLICATE KEY UPDATE amount = amount + 1;
 END$$
 
 DELIMITER ;
-

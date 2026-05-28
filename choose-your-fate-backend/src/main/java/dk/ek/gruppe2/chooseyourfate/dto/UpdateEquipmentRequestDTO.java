@@ -1,32 +1,19 @@
 package dk.ek.gruppe2.chooseyourfate.dto;
 
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateEquipmentRequestDTO {
 
-    private Integer headItemId;
-    private Integer chestItemId;
-    private Integer legsItemId;
+    private Integer itemId;
+    private String type;
 
-    public Integer getHeadItemId() {
-        return headItemId;
-    }
 
-    public void setHeadItemId(Integer headItemId) {
-        this.headItemId = headItemId;
-    }
-
-    public Integer getChestItemId() {
-        return chestItemId;
-    }
-
-    public void setChestItemId(Integer chestItemId) {
-        this.chestItemId = chestItemId;
-    }
-
-    public Integer getLegsItemId() {
-        return legsItemId;
-    }
-
-    public void setLegsItemId(Integer legsItemId) {
-        this.legsItemId = legsItemId;
-    }
 }

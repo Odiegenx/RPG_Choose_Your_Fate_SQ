@@ -3,38 +3,38 @@ package dk.ek.gruppe2.chooseyourfate.dto.scene;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
 
 public class SceneResponseDTO {
-    private Integer id;
-    private Integer chapterId;
+    private String id;
+    private String chapterId;
     private String name;
 
     public SceneResponseDTO() {
     }
 
-    public SceneResponseDTO(Integer id, String name, Integer chapterId) {
+    public SceneResponseDTO(String id, String name, String chapterId) {
         this.id = id;
         this.name = name;
         this.chapterId = chapterId;
     }
 
     public SceneResponseDTO(Scene scene) {
-        this.id = scene.getId();
+        this.id = scene.getId().toString();
         this.name = scene.getName();
-        this.chapterId = scene.getChapter().getId();
+        this.chapterId = scene.getChapter().getId().toString();
     }
 
     public SceneResponseDTO toDTO(Scene scene) {
         return new SceneResponseDTO(
-                scene.getId(),
+                scene.getId().toString(),
                 scene.getName(),
-                scene.getChapter().getId()
+                scene.getChapter().getId().toString()
         );
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -46,11 +46,12 @@ public class SceneResponseDTO {
         this.name = name;
     }
 
-    public Integer getChapterId() {
+    public String getChapterId() {
         return chapterId;
     }
 
-    public void setChapterId(Integer chapterId) {
+    public void setChapterId(String chapterId) {
         this.chapterId = chapterId;
     }
+
 }
