@@ -2,49 +2,72 @@ package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.ItemRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.ItemResponseDTO;
-import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
-import dk.ek.gruppe2.chooseyourfate.interfaces.ItemDataAccess;
-import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlItemService;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.ItemRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
 public class ItemService {
 
-    private final SqlItemService sqlItemService;
+    ItemRepository itemRepository;
 
-    public ItemService(SqlItemService sqlItemService) {
-        this.sqlItemService = sqlItemService;
+    public ItemService(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
     }
 
-    private ItemDataAccess resolveDataAccess(DataSourceType source) {
-        return switch (source) {
-            case SQL -> sqlItemService;
-            //case NEO4J -> neo4jItemService;
-            //case MONGODB -> mongoItemservice;
-            default -> throw new IllegalArgumentException("Unexpected value: " + source);
-        };
+    public List<ItemResponseDTO> getAllItems() {
+        List<Item> items = itemRepository.findAll();
+        List<ItemResponseDTO> response = items.stream().map((item -> new ItemResponseDTO(item))).toList();
+        return response;
     }
 
-    public List<ItemResponseDTO> getAllItems(DataSourceType source) {
-        return resolveDataAccess(source).getAllItems();
+    public ItemResponseDTO findById(Integer id) {
+        Item item = itemRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+        ItemResponseDTO response = new ItemResponseDTO(item);
+        return response;
     }
 
-    public ItemResponseDTO findById(DataSourceType source, Integer id) {
-        return resolveDataAccess(source).findById(id);
+    public ResponseEntity<ItemResponseDTO> createItem(ItemRequestDTO requestDTO) {
+        Item item = toEntity(requestDTO);
+        Item savedItem = itemRepository.save(item);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ItemResponseDTO(savedItem));
     }
 
-    public ResponseEntity<ItemResponseDTO> createItem(DataSourceType source, ItemRequestDTO requestDTO) {
-        return resolveDataAccess(source).createItem(requestDTO);
+    public ItemResponseDTO updateItem(Integer itemId, ItemRequestDTO requestDTO) {
+        Item item = itemRepository.findById(itemId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+        item.setName(requestDTO.getName());
+        item.setDescription(requestDTO.getDescription());
+        item.setType(requestDTO.getType());
+        itemRepository.save(item);
+        return new ItemResponseDTO(item);
     }
 
-    public ItemResponseDTO updateItem(DataSourceType source, Integer id, ItemRequestDTO requestDTO) {
-        return resolveDataAccess(source).updateItem(id, requestDTO);
+    public void deleteItem(Integer itemId) {
+        if (!itemRepository.existsById(itemId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        itemRepository.deleteById(itemId);
     }
 
-    public void deleteItem(DataSourceType source, Integer id) {
-        resolveDataAccess(source).deleteItem(id);
+    public Item getItemEntity(Integer id) {
+        return itemRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public Item toEntity(ItemRequestDTO requestDTO) {
+            Item item = new Item();
+            item.setName(requestDTO.getName());
+            item.setDescription(requestDTO.getDescription());
+            item.setType(requestDTO.getType());
+            return item;
+    }
+
+    public ItemResponseDTO toDto(Item item) {
+        return new ItemResponseDTO(item);
     }
 }

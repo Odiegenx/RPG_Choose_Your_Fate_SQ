@@ -5,6 +5,7 @@ import dk.ek.gruppe2.chooseyourfate.interfaces.LoadoutDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Equipment;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Inventory;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
+import dk.ek.gruppe2.chooseyourfate.service.ItemService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,10 @@ import java.util.ArrayList;
 public class SqlLoadoutService implements LoadoutDataAccess {
 
     private final SqlEquipmentService equipmentService;
-    private final SqlItemService itemService;
+    private final ItemService itemService;
     private final SqlInventoryService inventoryService;
 
-    public SqlLoadoutService(SqlEquipmentService equipmentService, SqlItemService itemService, SqlInventoryService inventoryService) {
+    public SqlLoadoutService(SqlEquipmentService equipmentService, ItemService itemService, SqlInventoryService inventoryService) {
         this.equipmentService = equipmentService;
         this.itemService = itemService;
         this.inventoryService = inventoryService;

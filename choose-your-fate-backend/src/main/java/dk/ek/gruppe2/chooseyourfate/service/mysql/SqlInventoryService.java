@@ -11,6 +11,7 @@ import dk.ek.gruppe2.chooseyourfate.model.mysql.InventoryHasItemId;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.InventoryHasItemRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.InventoryRepository;
+import dk.ek.gruppe2.chooseyourfate.service.ItemService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,11 @@ import java.util.List;
 @Service
 public class SqlInventoryService implements InventoryDataAccess {
 
-    private final SqlItemService itemService;
+    private final ItemService itemService;
     private final InventoryRepository inventoryRepository;
     private final InventoryHasItemRepository inventoryHasItemRepository;
 
-    public SqlInventoryService(InventoryRepository inventoryRepository, InventoryHasItemRepository inventoryHasItemRepository, SqlItemService itemService) {
+    public SqlInventoryService(InventoryRepository inventoryRepository, InventoryHasItemRepository inventoryHasItemRepository, ItemService itemService) {
         this.inventoryRepository = inventoryRepository;
         this.inventoryHasItemRepository = inventoryHasItemRepository;
         this.itemService = itemService;

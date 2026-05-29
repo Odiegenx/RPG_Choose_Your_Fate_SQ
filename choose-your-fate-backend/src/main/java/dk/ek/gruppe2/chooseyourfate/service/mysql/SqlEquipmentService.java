@@ -8,6 +8,7 @@ import dk.ek.gruppe2.chooseyourfate.model.mysql.Equipment;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.EquipmentRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.InventoryHasItemRepository;
+import dk.ek.gruppe2.chooseyourfate.service.ItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,9 +19,9 @@ import java.util.List;
 public class SqlEquipmentService implements EquipmentDataAccess {
 
     private final EquipmentRepository equipmentRepository;
-    private final SqlItemService itemService;
+    private final ItemService itemService;
 
-    public SqlEquipmentService(EquipmentRepository equipmentRepository, SqlItemService itemService, SqlInventoryService inventoryService, InventoryHasItemRepository inventoryHasItemRepository) {
+    public SqlEquipmentService(EquipmentRepository equipmentRepository, ItemService itemService, SqlInventoryService inventoryService, InventoryHasItemRepository inventoryHasItemRepository) {
         this.equipmentRepository = equipmentRepository;
         this.itemService = itemService;
     }
