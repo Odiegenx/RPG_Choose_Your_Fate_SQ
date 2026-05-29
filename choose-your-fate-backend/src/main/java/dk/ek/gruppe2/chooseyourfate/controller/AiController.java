@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/ai")
+@RequestMapping("/choose-your-fate/ai")
 @Tag(name = "AI", description = "Endpoints for AI-generated content using a configured LLM provider")
 public class AiController {
 

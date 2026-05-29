@@ -8,12 +8,16 @@ import org.springframework.ai.audio.tts.TextToSpeechResponse;
 import org.springframework.ai.elevenlabs.ElevenLabsTextToSpeechModel;
 import org.springframework.ai.elevenlabs.ElevenLabsTextToSpeechOptions;
 import org.springframework.ai.elevenlabs.api.ElevenLabsApi;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
 public class TTSService {
+
+    @Value("${elevenlabs.api.key}")
+    private String apiKey;
 
     private final CharacterPathRepository characterPathRepository;
 
@@ -40,7 +44,7 @@ public class TTSService {
 
     public byte[] createAudioBlob(String text) {
         ElevenLabsApi elevenLabsApi = ElevenLabsApi.builder()
-                .apiKey(System.getenv("ELEVEN_LABS_API_KEY"))
+                .apiKey(apiKey)
                 .build();
 
         ElevenLabsTextToSpeechModel elevenLabsTextToSpeechModel = ElevenLabsTextToSpeechModel.builder()
