@@ -3,26 +3,26 @@ export type User = {
 };
 
 export type Scene = {
-  id: string | number;
+  id: string;
   dialog: string[];
   img: string;
   choices: Choice[];
 };
 
 export type Choice = {
-    id: string | number
+    id: string
     name: string
-    destination_id: string | number
+    destination_id: string    
 };
 
 export type Character = {
-  id: number | "new-char";
-  accountId: number | "";
-  chapterId: number | "";
-  sceneId: number | "";
-  raceDetailsId: number | "";
+  id: string;
+  accountId: string;
+  chapterId: string;
+  sceneId: string;
+  raceDetailsId: string;
   name: string;
-  flag: string;
+  flag: {};
 };
 
 export type CharacterStats = {
@@ -82,35 +82,8 @@ export type CharacterPathStoryProps = {
 export type CharacterPath = {
   id: number;
   characterId: number;
-  summary: string | null;
-  audioBlob: string | null;
-};
-
-export type AiResponse = {
-  response: string;
-};
-
-export type SceneResponse = {
-  id: string;
-  chapterId: string;
-  name: string;
-};
-
-export type ChoiceResponse = {
-  id: string;
-  destinationSceneId: string;
-  sceneId: string;
-  description: string;
-  consequence: string;
-  targetId: number | null;
-  valueInt: number | null;
-  requirements: string | null;
-};
-
-export type SceneLookaheadResponse = {
-  scene: SceneResponse;
-  choices: ChoiceResponse[];
-  destinationScenes: SceneResponse[];
+  summary: string;
+  audioBlob: string;
 };
 
 export type InventoryItem = {
