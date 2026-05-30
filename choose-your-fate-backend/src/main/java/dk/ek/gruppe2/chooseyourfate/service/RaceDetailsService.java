@@ -1,9 +1,13 @@
 package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.RaceDetailsResponseDTO;
-import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
-import dk.ek.gruppe2.chooseyourfate.interfaces.RaceDetailsDataAccess;
-import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlRaceDetailsService;
+import dk.ek.gruppe2.chooseyourfate.exception.DuplicateResourceException;
+import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.RaceDetails;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterAvatarRepository;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.NpcRepository;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.RaceDetailsRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,33 +15,59 @@ import java.util.List;
 @Service
 public class RaceDetailsService {
 
-    private final SqlRaceDetailsService sqlRaceDetailsService;
+    private final RaceDetailsRepository raceDetailsRepository;
+    private final CharacterAvatarRepository characterAvatarRepository;
+    private final NpcRepository npcRepository;
 
     public RaceDetailsService(
-            SqlRaceDetailsService sqlRaceDetailsService
+            RaceDetailsRepository raceDetailsRepository,
+            CharacterAvatarRepository characterAvatarRepository,
+            NpcRepository npcRepository
     ) {
-        this.sqlRaceDetailsService = sqlRaceDetailsService;
+        this.raceDetailsRepository = raceDetailsRepository;
+        this.characterAvatarRepository = characterAvatarRepository;
+        this.npcRepository = npcRepository;
     }
 
-    public List<RaceDetailsResponseDTO> getAllRaceDetails(DataSourceType sourceHeader) {
-        return resolveDataAccess(sourceHeader).getAllRaceDetails();
+    public List<RaceDetailsResponseDTO> getAllRaceDetails() {
+        return raceDetailsRepository.findAll()
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
-    public RaceDetailsResponseDTO getRaceDetailsById(DataSourceType sourceHeader, Integer id) {
-        return resolveDataAccess(sourceHeader).getRaceDetailsById(id);
+    public RaceDetailsResponseDTO getRaceDetailsById(Integer id) {
+        return toDto(getRaceDetailsEntity(id));
     }
 
-    public RaceDetailsResponseDTO createRaceDetails(DataSourceType sourceHeader) {
-        return resolveDataAccess(sourceHeader).createRaceDetails();
+    public RaceDetailsResponseDTO createRaceDetails() {
+        try {
+            RaceDetails saved = raceDetailsRepository.save(new RaceDetails());
+            return toDto(saved);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DuplicateResourceException("Unable to create race details due to a data integrity conflict.");
+        }
     }
 
-    public void deleteRaceDetails(DataSourceType sourceHeader, Integer id) {
-        resolveDataAccess(sourceHeader).deleteRaceDetails(id);
+    public void deleteRaceDetails(Integer id) {
+        if (!raceDetailsRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Race details not found with id: " + id);
+        }
+
+        // Race details are a shared lookup entity, so delete must be blocked while characters or NPCs still reference it.
+        if (characterAvatarRepository.existsByRaceDetails_Id(id) || npcRepository.existsByRaceDetails_Id(id)) {
+            throw new IllegalArgumentException("Race details cannot be deleted while referenced by characters or NPCs.");
+        }
+
+        raceDetailsRepository.deleteById(id);
     }
 
-    private RaceDetailsDataAccess resolveDataAccess(DataSourceType sourceHeader) {
-        return switch (sourceHeader) {
-            case SQL -> sqlRaceDetailsService;
-        };
+    private RaceDetails getRaceDetailsEntity(Integer id) {
+        return raceDetailsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Race details not found with id: " + id));
+    }
+
+    private RaceDetailsResponseDTO toDto(RaceDetails raceDetails) {
+        return new RaceDetailsResponseDTO(raceDetails.getId(), raceDetails.getName());
     }
 }

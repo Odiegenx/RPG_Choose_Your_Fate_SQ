@@ -21,7 +21,6 @@ import dk.ek.gruppe2.chooseyourfate.repository.mysql.RaceDetailsRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.SceneRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.StoredProcedureQuery;
 import org.springframework.stereotype.Service;
 
@@ -31,22 +30,23 @@ import java.util.List;
 @Service
 public class CharacterService implements CharacterDataAccess<Integer> {
 
-    @PersistenceContext
     private EntityManager entityManager;
 
     private final CharacterAvatarRepository characterAvatarRepository;
     private final ChapterRepository chapterRepository;
     private final SceneRepository sceneRepository;
     private final RaceDetailsRepository raceDetailsRepository;
+
     private final CharacterDetailsRepository characterDetailsRepository;
     private final AccountRepository accountRepository;
 
     public CharacterService(
             CharacterAvatarRepository characterAvatarRepository,
-            CharacterDetailsRepository characterDetailsRepository,
             ChapterRepository chapterRepository,
             SceneRepository sceneRepository,
             RaceDetailsRepository raceDetailsRepository,
+            EntityManager entityManager,
+            CharacterDetailsRepository characterDetailsRepository,
             AccountRepository accountRepository
     ) {
         this.characterAvatarRepository = characterAvatarRepository;
@@ -55,6 +55,7 @@ public class CharacterService implements CharacterDataAccess<Integer> {
         this.sceneRepository = sceneRepository;
         this.raceDetailsRepository = raceDetailsRepository;
         this.accountRepository = accountRepository;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -191,11 +192,11 @@ public class CharacterService implements CharacterDataAccess<Integer> {
 
     private CharacterResponseDTO toDto(CharacterAvatar character) {
         return new CharacterResponseDTO(
-                character.getId().toString(),
-                character.getAccount().getId().toString(),
-                character.getChapter().getId().toString(),
-                character.getScene().getId().toString(),
-                character.getRaceDetails().getId().toString(),
+                character.getId(),
+                character.getAccount().getId(),
+                character.getChapter().getId(),
+                character.getScene().getId(),
+                character.getRaceDetails().getId(),
                 character.getName(),
                 character.getFlag()
         );

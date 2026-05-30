@@ -7,48 +7,67 @@ import org.springframework.stereotype.Service;
 import dk.ek.gruppe2.chooseyourfate.dto.choice.ChoiceResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.choice.CreateChoiceRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.choice.UpdateChoiceRequestDTO;
-import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
-import dk.ek.gruppe2.chooseyourfate.interfaces.ChoiceDataAccess;
-import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlChoiceService;
+import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Choice;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.ChoiceRepository;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.SceneRepository;
 
 @Service
 public class ChoiceService {
-    private final SqlChoiceService sqlChoiceService;
+    private final ChoiceRepository choiceRepository;
+    private final SceneRepository sceneRepository;
 
-    public ChoiceService(
-            SqlChoiceService sqlChoiceService
-    ) {
-        this.sqlChoiceService = sqlChoiceService;
+    public ChoiceService(ChoiceRepository choiceRepository, SceneRepository sceneRepository) {
+        this.choiceRepository = choiceRepository;
+        this.sceneRepository = sceneRepository;
     }
 
-    public List<ChoiceResponseDTO> getAllChoices(DataSourceType source) {
-        return resolveDataService(source).getAllChoices();
+    public List<ChoiceResponseDTO> getAllChoices() {
+        return choiceRepository.findAll()
+                .stream()
+                .map(ChoiceResponseDTO::new)
+                .toList();
     }
 
-    public ChoiceResponseDTO getChoiceById(DataSourceType source, Integer id) {
-        return resolveDataService(source).getChoiceById(id);
+    public ChoiceResponseDTO getChoiceById(Integer id) {
+        return new ChoiceResponseDTO(getChoiceEntity(id));
     }
 
-    public ChoiceResponseDTO createChoice(DataSourceType source, CreateChoiceRequestDTO request) {
-        return resolveDataService(source).createChoice(request);
+    public ChoiceResponseDTO createChoice(CreateChoiceRequestDTO request) {
+        Choice choice = request.toEntity(getSceneById(request.getSceneId()), getSceneById(request.getDestinationSceneId()));
+        return new ChoiceResponseDTO(choiceRepository.save(choice));
     }
 
-    public ChoiceResponseDTO updateChoice(DataSourceType source, Integer id, UpdateChoiceRequestDTO request) {
-        return resolveDataService(source).updateChoice(id, request);
+
+    public ChoiceResponseDTO updateChoice(Integer id, UpdateChoiceRequestDTO request) {
+        Choice choice = getChoiceEntity(id);
+
+        choice.setDescription(request.getDescription());
+        choice.setScene(getSceneById(request.getSceneId()));
+        choice.setDestinationScene(getSceneById(request.getDestinationSceneId()));
+        choice.setConsequence(request.getConsequence());
+        choice.setTargetId(request.getTargetId());
+        choice.setValueInt(request.getValueInt());
+        choice.setRequirements(request.getRequirements());
+        choice.setStoryWeight(request.getStoryWeight());
+        return new ChoiceResponseDTO(choiceRepository.save(choice));
     }
 
-    public void deleteChoice(DataSourceType source, Integer id) {
-        resolveDataService(source).deleteChoice(id);
+    public void deleteChoice(Integer id) {
+        if (!choiceRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Choice not found with id: " + id);
+        }
+        choiceRepository.deleteById(id);
     }
 
-    public ChoiceResponseDTO registerChoice(CreateChoiceRequestDTO request) {
-        return sqlChoiceService.createChoice(request);
+    private Choice getChoiceEntity(Integer id) {
+        return choiceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Choice not found with id: " + id));
     }
 
-    private ChoiceDataAccess resolveDataService(DataSourceType source) {
-        return switch (source) {
-            case SQL -> sqlChoiceService;
-            default -> throw new IllegalArgumentException("Unexpected value: " + source);
-        };
+    private Scene getSceneById(Integer sceneId){
+        return sceneRepository.findById(sceneId)
+            .orElseThrow(() -> new ResourceNotFoundException("Scene not found with id: " + sceneId));
     }
 }

@@ -23,13 +23,13 @@ public class AuthenticationController {
     private final AccountService accountService;
 
     public AuthenticationController(AuthenticationManager authManager,
-                        JwtUtil jwtUtil,                          
-                        AccountService accountService) {
+                                    JwtUtil jwtUtil,
+                                    AccountService accountService) {
         this.authManager = authManager;
         this.jwtUtil = jwtUtil;
         this.accountService = accountService;
     }
-    
+
     @PostMapping("/register")
     public AccountResponseDTO register(@RequestBody CreateAccountRequestDTO acc) {
         return accountService.registerAccount(acc);
@@ -39,10 +39,10 @@ public class AuthenticationController {
     public AuthTokenResponseDTO login(@RequestBody LoginDTO request) {
 
         Authentication auth = authManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
-                request.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
         );
 
         UserDetails user = (UserDetails) auth.getPrincipal();

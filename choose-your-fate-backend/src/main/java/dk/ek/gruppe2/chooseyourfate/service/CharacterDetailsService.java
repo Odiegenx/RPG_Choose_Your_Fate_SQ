@@ -2,9 +2,9 @@ package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterDetailsResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.UpdateCharacterDetailsRequestDTO;
-import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
-import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterDetailsDataAccess;
-import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlCharacterDetailsService;
+import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterDetails;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterDetailsRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,33 +12,42 @@ import java.util.List;
 @Service
 public class CharacterDetailsService {
 
-    private final SqlCharacterDetailsService sqlCharacterDetailsService;
+    private final CharacterDetailsRepository characterDetailsRepository;
 
-    public CharacterDetailsService(
-        SqlCharacterDetailsService sqlCharacterDetailsService
-    ) {
-        this.sqlCharacterDetailsService = sqlCharacterDetailsService;
+    public CharacterDetailsService(CharacterDetailsRepository characterDetailsRepository) {
+        this.characterDetailsRepository = characterDetailsRepository;
     }
 
-    public List<CharacterDetailsResponseDTO> getAllCharacterDetails(DataSourceType sourceHeader) {
-        return resolveDataAccess(sourceHeader).getAllCharacterDetails();
+    public List<CharacterDetailsResponseDTO> getAllCharacterDetails() {
+        return characterDetailsRepository.findAll()
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
-    public CharacterDetailsResponseDTO getCharacterDetailsByCharacterId(DataSourceType sourceHeader, Integer characterId) {
-        return resolveDataAccess(sourceHeader).getCharacterDetailsByCharacterId(characterId);
+    public CharacterDetailsResponseDTO getCharacterDetailsByCharacterId(Integer characterId) {
+        return toDto(getCharacterDetailsEntity(characterId));
     }
 
-    public CharacterDetailsResponseDTO updateCharacterDetails(
-            DataSourceType sourceHeader,
-            Integer characterId,
-            UpdateCharacterDetailsRequestDTO request
-    ) {
-        return resolveDataAccess(sourceHeader).updateCharacterDetails(characterId, request);
+    public CharacterDetailsResponseDTO updateCharacterDetails(Integer characterId, UpdateCharacterDetailsRequestDTO request) {
+        CharacterDetails details = getCharacterDetailsEntity(characterId);
+        details.setIntelligence(request.getIntelligence());
+        details.setCharisma(request.getCharisma());
+        details.setFashion(request.getFashion());
+        return toDto(characterDetailsRepository.save(details));
     }
 
-    private CharacterDetailsDataAccess resolveDataAccess(DataSourceType sourceHeader) {
-        return switch (sourceHeader) {
-            case SQL -> sqlCharacterDetailsService;
-        };
+    private CharacterDetails getCharacterDetailsEntity(Integer characterId) {
+        return characterDetailsRepository.findById(characterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Character details not found for character id: " + characterId));
+    }
+
+    private CharacterDetailsResponseDTO toDto(CharacterDetails details) {
+        return new CharacterDetailsResponseDTO(
+                details.getCharacterId(),
+                details.getIntelligence(),
+                details.getCharisma(),
+                details.getFashion()
+        );
     }
 }

@@ -6,8 +6,8 @@ import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterAvatar;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterAvatarRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterPathChoiceRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterPathRepository;
-import dk.ek.gruppe2.chooseyourfate.service.CharacterPathService;
 
+import dk.ek.gruppe2.chooseyourfate.service.CharacterPathService;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;

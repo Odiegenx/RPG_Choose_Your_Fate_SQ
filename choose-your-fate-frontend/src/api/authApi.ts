@@ -33,8 +33,7 @@ export async function apiGet(apiPath: string, options?: { token: string | null }
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
-      Authorization: `Bearer ${options ? options.token : null}`,
-      "X-Data-Source": "SQL"
+      Authorization: `Bearer ${options ? options.token : null}`
      },
   });
 
@@ -54,10 +53,45 @@ export async function apiPost(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${options ? options.token : null}`,
-      "X-Data-Source": "SQL",
+      Authorization: `Bearer ${options ? options.token : null}`
     },
     body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    throw new Error("Request failed");
+  }
+
+  return res.json();
+}
+
+export async function apiGetBlob(apiPath: string, options?: { token: string | null }) {
+  const res = await fetch(`${API_URL}choose-your-fate/${apiPath}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${options ? options.token : null}`
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Request failed");
+  }
+
+  return res.blob();
+}
+
+export async function apiPut(
+  apiPath: string,
+  body?: unknown,
+  options?: { token: string | null }
+) {
+  const res = await fetch(`${API_URL}choose-your-fate/${apiPath}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${options ? options.token : null}`
+    },
+    body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!res.ok) {

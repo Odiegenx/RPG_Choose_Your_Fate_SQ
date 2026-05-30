@@ -2,11 +2,11 @@ package dk.ek.gruppe2.chooseyourfate.dto;
 
 public class CharacterResponseDTO {
 
-    private String id;
-    private String accountId;
-    private String chapterId;
-    private String sceneId;
-    private String raceDetailsId;
+    private Integer id;
+    private Integer accountId;
+    private Integer chapterId;
+    private Integer sceneId;
+    private Integer raceDetailsId;
     private String name;
     private String flag;
 
@@ -14,11 +14,11 @@ public class CharacterResponseDTO {
     }
 
     public CharacterResponseDTO(
-            String id,
-            String accountId,
-            String chapterId,
-            String sceneId,
-            String raceDetailsId,
+            Integer id,
+            Integer accountId,
+            Integer chapterId,
+            Integer sceneId,
+            Integer raceDetailsId,
             String name,
             String flag
     ) {
@@ -31,43 +31,43 @@ public class CharacterResponseDTO {
         this.flag = flag;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getAccountId() {
+    public Integer getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(String accountId) {
+    public void setAccountId(Integer accountId) {
         this.accountId = accountId;
     }
 
-    public String getChapterId() {
+    public Integer getChapterId() {
         return chapterId;
     }
 
-    public void setChapterId(String chapterId) {
+    public void setChapterId(Integer chapterId) {
         this.chapterId = chapterId;
     }
 
-    public String getSceneId() {
+    public Integer getSceneId() {
         return sceneId;
     }
 
-    public void setSceneId(String sceneId) {
+    public void setSceneId(Integer sceneId) {
         this.sceneId = sceneId;
     }
 
-    public String getRaceDetailsId() {
+    public Integer getRaceDetailsId() {
         return raceDetailsId;
     }
 
-    public void setRaceDetailsId(String raceDetailsId) {
+    public void setRaceDetailsId(Integer raceDetailsId) {
         this.raceDetailsId = raceDetailsId;
     }
 

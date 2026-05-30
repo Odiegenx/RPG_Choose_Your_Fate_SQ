@@ -8,7 +8,7 @@
 		<version>4.0.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
+	<groupId>dk.ek.gruppe2.chooseyourfate</groupId>
 	<artifactId>choose-your-fate-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>choose-your-fate-backend</name>
@@ -152,6 +152,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.14.1</version>
 				<configuration>
 					<annotationProcessorPaths>
 						<path>
@@ -176,6 +177,54 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>properties</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--
+            Source - https://stackoverflow.com/a/79306379
+            Posted by lcnicolau, modified by community. See post 'Timeline' for change history
+            Retrieved 2026-05-27, License - CC BY-SA 4.0
+            -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- ONLY run unit folder -->
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
+
+					<!-- NEVER run integration tests -->
+					<excludes>
+						<exclude>**/*IT.java</exclude>
+					</excludes>
+					<argLine>
+						-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+						-Xshare:off
+					</argLine>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

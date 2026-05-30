@@ -1,7 +1,9 @@
 package dk.ek.gruppe2.chooseyourfate.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class CreateCharacterRequestDTO {
     private Integer chapterId;
     private Integer sceneId;

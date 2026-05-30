@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const url = process.env.API_URL
+const url = ""
 //TODO: remove this describe and everything within it, when example is no longer needed
 test.describe("example endpoint", ()=> {
     test('Valid GET request returning address', async ({ request }) => {

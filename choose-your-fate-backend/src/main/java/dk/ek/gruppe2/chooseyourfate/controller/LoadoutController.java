@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/choose-your-fate/loadout")
 public class LoadoutController {
 
-    private static final String DATA_SOURCE_HEADER = "X-Data-Source";
-
     private final LoadoutService loadoutService;
 
     public LoadoutController(LoadoutService loadoutService) {
@@ -20,32 +18,28 @@ public class LoadoutController {
 
     @GetMapping("/{characterId}")
     @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
-    public LoadoutResponseDTO getLoadout(
-            @RequestHeader(value = DATA_SOURCE_HEADER, required = true) DataSourceType dataSource,
-            @PathVariable Integer characterId)
+    public LoadoutResponseDTO getLoadout(@PathVariable Integer characterId)
     {
-        return loadoutService.getLoadoutByCharacterId(dataSource, characterId);
+        return loadoutService.getLoadoutByCharacterId(characterId);
     }
 
 
     @PostMapping("/{characterId}/unequip")
     @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
     public LoadoutResponseDTO unequipItem(
-            @RequestHeader(value = DATA_SOURCE_HEADER, required = true) DataSourceType dataSource,
             @PathVariable Integer characterId,
             @RequestBody Integer itemId
     ) {
-        return loadoutService.unequipItem(dataSource, characterId, itemId);
+        return loadoutService.unequipItem(characterId, itemId);
     }
 
     @PostMapping("/{characterId}/equip")
     @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
     public LoadoutResponseDTO equipItem(
-            @RequestHeader(value = DATA_SOURCE_HEADER, required = true) DataSourceType dataSource,
             @PathVariable Integer characterId,
             @RequestBody Integer itemId
     ) {
-        return loadoutService.equipItem(dataSource, characterId, itemId);
+        return loadoutService.equipItem(characterId, itemId);
     }
 
 

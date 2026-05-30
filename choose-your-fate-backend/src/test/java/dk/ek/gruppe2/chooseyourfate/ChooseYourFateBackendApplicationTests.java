@@ -1,6 +1,5 @@
-package com.example.chooseyourfatebackend;
+package dk.ek.gruppe2.chooseyourfate;
 
-import dk.ek.gruppe2.chooseyourfate.ChooseYourFateBackendApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;

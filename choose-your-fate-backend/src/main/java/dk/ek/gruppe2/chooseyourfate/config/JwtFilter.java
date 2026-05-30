@@ -48,8 +48,8 @@ public class JwtFilter extends OncePerRequestFilter {
                     CustomUserDetails user = service.loadUserByUsername(username);
 
                     UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                            user, null, user.getAuthorities());
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null, user.getAuthorities());
 
 
                     Map<String, Object> extraInfo = new HashMap<>();

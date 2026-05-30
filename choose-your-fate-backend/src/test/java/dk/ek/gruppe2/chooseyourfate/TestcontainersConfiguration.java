@@ -1,4 +1,4 @@
-package com.example.chooseyourfatebackend;
+package dk.ek.gruppe2.chooseyourfate;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;

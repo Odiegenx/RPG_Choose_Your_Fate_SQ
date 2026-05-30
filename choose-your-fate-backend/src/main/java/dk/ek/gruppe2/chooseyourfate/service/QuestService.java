@@ -1,4 +1,4 @@
-package dk.ek.gruppe2.chooseyourfate.service.mysql;
+package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.QuestRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.QuestResponseDTO;

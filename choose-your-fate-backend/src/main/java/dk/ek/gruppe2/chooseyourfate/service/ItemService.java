@@ -60,14 +60,15 @@ public class ItemService {
     }
 
     public Item toEntity(ItemRequestDTO requestDTO) {
-            Item item = new Item();
-            item.setName(requestDTO.getName());
-            item.setDescription(requestDTO.getDescription());
-            item.setType(requestDTO.getType());
-            return item;
+        Item item = new Item();
+        item.setName(requestDTO.getName());
+        item.setDescription(requestDTO.getDescription());
+        item.setType(requestDTO.getType());
+        return item;
     }
 
     public ItemResponseDTO toDto(Item item) {
         return new ItemResponseDTO(item);
     }
+
 }

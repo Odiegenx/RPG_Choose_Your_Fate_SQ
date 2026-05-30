@@ -2,7 +2,7 @@ package dk.ek.gruppe2.chooseyourfate.controller;
 
 import dk.ek.gruppe2.chooseyourfate.dto.NpcRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.NpcResponseDTO;
-import dk.ek.gruppe2.chooseyourfate.service.mysql.NpcService;
+import dk.ek.gruppe2.chooseyourfate.service.NpcService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

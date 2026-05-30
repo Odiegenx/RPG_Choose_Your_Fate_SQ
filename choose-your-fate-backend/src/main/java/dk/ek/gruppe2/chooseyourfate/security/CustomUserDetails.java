@@ -39,7 +39,7 @@ public class CustomUserDetails implements UserDetails {
         return List.of(new SimpleGrantedAuthority(accountSql.getRole().name()));
     }
 
-    public String getPassword(DataSourceType dataSource) { 
+    public String getPassword(DataSourceType dataSource) {
         return accountSql.getPassword();
     }
 
@@ -47,7 +47,7 @@ public class CustomUserDetails implements UserDetails {
         return accountSql.getUsername();
     }
 
-    public String getId(DataSourceType dataSource) { 
+    public String getId(DataSourceType dataSource) {
         return accountSql.getId().toString();
     }
     @Override public boolean isAccountNonExpired() { return true; }

@@ -5,7 +5,7 @@ import "./ShowDialog.css";
 
 type Props = {
   nextscene: Scene;
-  changeScene: (id: number) => void;
+  changeScene: (destinationSceneId: string | number, choiceId: string | number) => void;
 };
 
 export function ShowDialog({ nextscene, changeScene }: Props) {
@@ -47,7 +47,10 @@ export function ShowDialog({ nextscene, changeScene }: Props) {
           <div
             key={choice.id}
             className="choice"
-            onClick={() => changeScene(choice.destination_id)}
+            onClick={(event) => {
+              event.stopPropagation();
+              changeScene(choice.destination_id, choice.id);
+            }}
           >
             {choice.name}
           </div>

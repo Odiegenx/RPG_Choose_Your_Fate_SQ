@@ -3,7 +3,6 @@ package dk.ek.gruppe2.chooseyourfate.service;
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterPathResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.UpdateCharacterPathRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
-import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterPathDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterPath;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterPathChoice;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterPathChoiceId;
@@ -17,20 +16,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CharacterPathService implements CharacterPathDataAccess {
+public class CharacterPathService {
 
     private final CharacterPathRepository characterPathRepository;
     private final ChoiceRepository choiceRepository;
     private final CharacterPathChoiceRepository characterPathChoiceRepository;
 
-    
+
     public CharacterPathService(CharacterPathRepository characterPathRepository, ChoiceRepository choiceRepository, CharacterPathChoiceRepository characterPathChoiceRepository) {
         this.characterPathRepository = characterPathRepository;
         this.choiceRepository = choiceRepository;
         this.characterPathChoiceRepository = characterPathChoiceRepository;
     }
 
-    @Override
     public List<CharacterPathResponseDTO> getAllCharacterPaths() {
         return characterPathRepository.findAll()
                 .stream()
@@ -38,19 +36,17 @@ public class CharacterPathService implements CharacterPathDataAccess {
                 .toList();
     }
 
-    @Override
     public CharacterPathResponseDTO getCharacterPathByCharacterId(Integer characterId) {
         return toDto(getCharacterPathEntity(characterId));
     }
 
-    @Override
+
     public CharacterPathResponseDTO updateCharacterPath(Integer characterId, UpdateCharacterPathRequestDTO request) {
         CharacterPath characterPath = getCharacterPathEntity(characterId);
         characterPath.setSummary(request.getSummary());
         return toDto(characterPathRepository.save(characterPath));
     }
 
-    @Override
     public CharacterPathChoiceId updateCharacterPathChoice(Integer characterId, Integer choiceId) {
         CharacterPath characterPath = getCharacterPathEntity(characterId);
         Choice choice = getChoiceEntity(choiceId);
