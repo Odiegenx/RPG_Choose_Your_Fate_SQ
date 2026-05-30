@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .requestMatchers("/choose-your-fate/characters/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/choose-your-fate/inventories/**").authenticated()
                 .requestMatchers("/choose-your-fate/tts/test").permitAll()
+                .requestMatchers("/availability/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

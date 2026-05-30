@@ -12,7 +12,6 @@ import dk.ek.gruppe2.chooseyourfate.service.InventoryService;
 import dk.ek.gruppe2.chooseyourfate.service.ItemService;
 import dk.ek.gruppe2.chooseyourfate.TestContainerConfig;
 import jakarta.transaction.Transactional;
-import org.hibernate.ResourceClosedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -84,17 +83,22 @@ public class InventoryServiceIT {
     @ValueSource(ints = {2, 10})
     void removeItem_ShouldDecrementAmount_WhenAmountGreaterThan1(int amount) {
         // Arrange
-        InventoryHasItem item = inventoryHasItemRepository
-                .findById(new InventoryHasItemId(1, 1)).get();
-        item.setAmount(amount);
-        inventoryHasItemRepository.save(item);
+        Item item = new Item();
+        item.setType(ItemType.WEAPON);
+        item.setName("Sword of Testing");
+        Item savedItem = itemRepository.save(item);
+
+        Inventory inventory = inventoryRepository.findByCharacter_Id(1);
+        InventoryHasItem inventoryHasItem = new InventoryHasItem(item, inventory, amount);
+
+        inventoryHasItemRepository.save(inventoryHasItem);
 
         // Act
-        inventoryService.removeItem(1, 1);
+        inventoryService.removeItem(inventory.getId(), savedItem.getId());
 
         // Assert
         InventoryHasItem result = inventoryHasItemRepository
-                .findById(new InventoryHasItemId(1, 1)).get();
+                .findById(new InventoryHasItemId(savedItem.getId(), inventory.getId())).get();
         assertEquals(amount - 1, result.getAmount());
     }
 
@@ -102,17 +106,22 @@ public class InventoryServiceIT {
     void removeItem_ShouldRemoveInventoryHasItemRow_WhenAmountIsEqualToOne() {
 
         // Arrange
-        InventoryHasItem item = inventoryHasItemRepository
-                .findById(new InventoryHasItemId(1, 1)).get();
-        item.setAmount(1);
-        inventoryHasItemRepository.save(item);
+        Item item = new Item();
+        item.setType(ItemType.WEAPON);
+        item.setName("Sword of Testing");
+        Item savedItem = itemRepository.save(item);
+
+        Inventory inventory = inventoryRepository.findByCharacter_Id(1);
+        InventoryHasItem inventoryHasItem = new InventoryHasItem(savedItem, inventory, 1);
+
+        inventoryHasItemRepository.save(inventoryHasItem);
 
         // Act
-        inventoryService.removeItem(1, 1);
+        inventoryService.removeItem(inventory.getId(), savedItem.getId());
 
         // Assert
         assertFalse(inventoryHasItemRepository
-                        .existsById(new InventoryHasItemId(1, 1)),
+                        .existsById(new InventoryHasItemId(savedItem.getId(), inventory.getId())),
                 "Row should have been deleted when amount reached 1"
         );
     }

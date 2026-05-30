@@ -14,6 +14,20 @@ services:
       - ./rpg_mysql_sq:/docker-entrypoint-initdb.d
     hostname: rpg_mysql_sq
 
+  rpg_mysql_secondary:
+    image: mysql:9.5.0
+    container_name: rpg_mysql_secondary
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_SECONDARY_ROOT_PASSWORD:-123456}
+    volumes:
+      - rpg_mysql_secondary:/var/lib/mysql
+      - ./rpg_mysql:/docker-entrypoint-initdb.d
+    hostname: rpg_mysql_secondary
+
 volumes:
   rpg_mysql_sq:
+    driver: local
+  rpg_mysql_secondary:
     driver: local

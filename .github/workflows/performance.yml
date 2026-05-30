@@ -1,0 +1,39 @@
+name: k6 Performance Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-k6-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      K6_USERNAME: ${{ secrets.K6_USERNAME }}
+      K6_PASSWORD: ${{ secrets.K6_PASSWORD }}
+      K6_WEB_DASHBOARD: true
+      K6_WEB_DASHBOARD_EXPORT: k6/results/${{ matrix.name }}-report.html
+
+    strategy:
+      matrix:
+        include:
+          - name: load
+            file: k6/tests/load-test.js
+          - name: stress
+            file: k6/tests/stress-test.js
+          - name: spike
+            file: k6/tests/spike-test.js
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: grafana/setup-k6-action@v1
+
+      - name: Run k6 test
+        uses: grafana/run-k6-action@v1
+        with:
+          path: ${{ matrix.file }}
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-report-${{ matrix.name }}
+          path: k6/results/${{ matrix.name }}-report.html

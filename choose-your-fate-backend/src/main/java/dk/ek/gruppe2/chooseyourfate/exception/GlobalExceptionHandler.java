@@ -1,5 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.exception;
 
+import dk.ek.gruppe2.chooseyourfate.availability.routing.InvalidDatabaseStateTransitionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -81,6 +82,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AiServiceException.class)
     public ResponseEntity<?> handleAiService(AiServiceException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", 503,
+                "error", "Service Unavailable",
+                "message", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(InvalidDatabaseStateTransitionException.class)
+    public ResponseEntity<?> handleInvalidDatabaseStateTransition(InvalidDatabaseStateTransitionException ex) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
                 "timestamp", LocalDateTime.now().toString(),
                 "status", 503,
