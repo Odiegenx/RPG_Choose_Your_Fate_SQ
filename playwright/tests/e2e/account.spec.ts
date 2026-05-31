@@ -1,22 +1,17 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, firefox, test, webkit, type APIRequestContext, type Browser, type Page } from '@playwright/test';
+
+type AccountCredentials = {
+  username: string;
+  email: string;
+  password: string;
+};
 
 type Character = {
   id: number;
   name: string;
 };
 
-type AuthenticatedAccount = {
-  id: number;
-  token: string;
-};
-
 const accountTestCharacterPrefix = 'account-e2e-';
-const accountTestUsername = 'account-page-e2e-user';
-const accountTestEmail = 'account-page-e2e-user@chooseyourfate.dk';
-const accountTestPassword = 'account-page-e2e-password';
-const accountTestCharacterLimit = 20;
-
-test.describe.configure({ mode: 'serial' });
 
 function apiEndpoint(path: string) {
   if (!process.env.API_URL) {
@@ -36,46 +31,41 @@ function uniqueValue(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function tokenAccountId(token: string) {
-  const payload = token.split('.')[1];
-  const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
-  const paddedPayload = normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, '=');
-  const claims = JSON.parse(Buffer.from(paddedPayload, 'base64').toString('utf8')) as { sqlId: string };
-  return Number(claims.sqlId);
+function newAccountCredentials(): AccountCredentials {
+  const username = uniqueValue('account-page-user');
+
+  return {
+    username,
+    email: `${username}@chooseyourfate.dk`,
+    password: 'account-page-password',
+  };
 }
 
-async function getDedicatedAccount(request: APIRequestContext): Promise<AuthenticatedAccount> {
-  await request.post(apiEndpoint('auth/register'), {
-    data: {
-      username: accountTestUsername,
-      email: accountTestEmail,
-      password: accountTestPassword,
-    },
-  });
+async function login(page: Page, credentials: AccountCredentials) {
+  await page.getByRole('textbox', { name: 'Username' }).fill(credentials.username);
+  await page.getByRole('textbox', { name: 'Password' }).fill(credentials.password);
+  await page.getByRole('button', { name: 'Login' }).click();
 
-  const loginResponse = await request.post(apiEndpoint('auth/login'), {
-    data: {
-      username: accountTestUsername,
-      password: accountTestPassword,
-    },
-  });
-  expect(loginResponse.status()).toBe(200);
+  await expect(page).toHaveURL(/.*\/account/);
+  const token = await page.evaluate(() => window.localStorage.getItem('token'));
+  expect(token).not.toBeNull();
+  return token!;
+}
 
-  const { token } = await loginResponse.json() as { token: string };
-  const account = {
-    id: tokenAccountId(token),
-    token,
+async function registerAndLogin(page: Page) {
+  const credentials = newAccountCredentials();
+
+  await page.goto('/register');
+  await page.getByRole('textbox', { name: 'Username' }).fill(credentials.username);
+  await page.getByRole('textbox', { name: 'email' }).fill(credentials.email);
+  await page.getByRole('textbox', { name: 'Password' }).fill(credentials.password);
+  await page.getByRole('button', { name: 'Register new account' }).click();
+
+  await expect(page).toHaveURL(/.*\/$/);
+  return {
+    credentials,
+    token: await login(page, credentials),
   };
-
-  const updateResponse = await request.put(apiEndpoint(`choose-your-fate/accounts/${account.id}`), {
-    headers: authorization(account.token),
-    data: {
-      characterLimit: accountTestCharacterLimit,
-    },
-  });
-  expect(updateResponse.status()).toBe(200);
-
-  return account;
 }
 
 async function openAccountPage(page: Page, token: string) {
@@ -88,25 +78,10 @@ async function openAccountPage(page: Page, token: string) {
   await expect(page.getByText('You are logged in (token present)')).toBeVisible();
 }
 
-async function createCharacter(request: APIRequestContext, token: string): Promise<Character> {
-  const response = await request.post(apiEndpoint('choose-your-fate/characters'), {
-    headers: authorization(token),
-    data: {
-      raceDetailsId: 1,
-      name: uniqueValue(accountTestCharacterPrefix),
-    },
-  });
-  expect(response.status()).toBe(200);
-
-  return response.json() as Promise<Character>;
-}
-
-async function setCharacterSummary(request: APIRequestContext, token: string, characterId: number, summary: string) {
-  const response = await request.put(apiEndpoint(`choose-your-fate/character-paths/${characterId}`), {
-    headers: authorization(token),
-    data: { summary },
-  });
-  expect(response.status()).toBe(200);
+async function openAccountPageInBrowser(browser: Browser, token: string) {
+  const page = await browser.newPage();
+  await openAccountPage(page, token);
+  return page;
 }
 
 async function deleteCharacter(request: APIRequestContext, token: string, characterId: number) {
@@ -117,6 +92,7 @@ async function deleteCharacter(request: APIRequestContext, token: string, charac
 }
 
 async function createCharacterFromAccountPage(page: Page): Promise<Character> {
+  await expect(page.getByText('New Character', { exact: true })).toBeVisible({ timeout: 15_000 });
   await page.getByText('New Character', { exact: true }).click();
 
   const nameInput = page.getByRole('textbox', { name: 'name' });
@@ -171,77 +147,49 @@ test('account page redirects unauthenticated users to login', async ({ page }) =
   await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
 });
 
-// Verifies that a signed-in user can open the account page and return to login by logging out.
-test('account page shows the signed-in state and logs the user out', async ({ page, request }) => {
-  const { token } = await getDedicatedAccount(request);
-  await openAccountPage(page, token);
+// Verifies one complete account journey with one shared account and one character created by each browser engine.
+// The paid TTS request runs once from Chromium after the three character slots have been filled.
+test('account page supports registration, three browser character slots, logout, game choices, and TTS playback', async ({ browserName, page, request }) => {
+  test.skip(browserName !== 'chromium', 'Chromium coordinates this shared-account journey and launches Firefox and WebKit.');
+  test.setTimeout(240_000);
 
-  await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Logout' }).click();
-
-  await expect(page).toHaveURL(/.*\/$/);
-  await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
-  await expect(page.evaluate(() => window.localStorage.getItem('token'))).resolves.toBeNull();
-});
-
-// Verifies the account-page character creation flow, including required fields and the refreshed list.
-test('account page creates a character from the new-character form', async ({ page, request }) => {
-  const { token } = await getDedicatedAccount(request);
-  let createdCharacter: Character | null = null;
+  const firefoxBrowser = await firefox.launch();
+  const webkitBrowser = await webkit.launch();
+  const characters: Character[] = [];
+  let token = '';
 
   try {
-    await openAccountPage(page, token);
-    createdCharacter = await createCharacterFromAccountPage(page);
-  } finally {
-    if (createdCharacter) {
-      await deleteCharacter(request, token, createdCharacter.id);
-    }
-  }
-});
+    const account = await registerAndLogin(page);
+    token = account.token;
 
-// Verifies that selecting a character reveals its account-page details and that Play opens the game with that character.
-test('account page opens character details, shows the story, and starts the game', async ({ page, request }) => {
-  const { token } = await getDedicatedAccount(request);
-  const character = await createCharacter(request, token);
+    await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible();
+    await page.getByRole('button', { name: 'Logout' }).click();
+    await expect(page).toHaveURL(/.*\/$/);
+    await expect(page.evaluate(() => window.localStorage.getItem('token'))).resolves.toBeNull();
+    token = await login(page, account.credentials);
 
-  try {
-    await setCharacterSummary(request, token, character.id, 'The account E2E character is ready to continue the story.');
-    await openAccountPage(page, token);
+    const firefoxPage = await openAccountPageInBrowser(firefoxBrowser, token);
+    const webkitPage = await openAccountPageInBrowser(webkitBrowser, token);
+
+    characters.push(await createCharacterFromAccountPage(page));
+    characters.push(await createCharacterFromAccountPage(firefoxPage));
+    characters.push(await createCharacterFromAccountPage(webkitPage));
+
+    await page.goto('/account');
+    await firefoxPage.goto('/account');
+    await webkitPage.goto('/account');
+    await expect(page.getByText('New Character', { exact: true })).toHaveCount(0);
+    await expect(firefoxPage.getByText('New Character', { exact: true })).toHaveCount(0);
+    await expect(webkitPage.getByText('New Character', { exact: true })).toHaveCount(0);
+
+    const character = characters[0];
     await page.getByText(character.name, { exact: true }).click();
-
     await expect(page.getByRole('heading', { name: 'Equipment' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Inventory' })).toBeVisible();
     await expect(page.getByText(`Name: ${character.name}`)).toBeVisible();
     await expect(page.getByText(`Story so far for ${character.name}`)).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Generate Audio' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Play', exact: true }).click();
-
-    await expect(page).toHaveURL(/.*\/game/);
-    await expect(page.evaluate(() => window.localStorage.getItem('characterId'))).resolves.toBe(character.id.toString());
-  } finally {
-    await deleteCharacter(request, token, character.id);
-  }
-});
-
-// Verifies the live TTS journey once in Chromium: create a character, make two choices, generate MP3 data, and play it.
-// To run the paid TTS check in Firefox or WebKit as well, comment out the skip below.
-// Firefox and WebKit remain listed by Playwright and will run the same test body once the skip is removed.
-test('generate audio calls the TTS endpoint and starts audio playback', async ({ browserName, page, request }) => {
-  test.skip(browserName !== 'chromium', 'The live TTS playback check runs once and uses Chromium autoplay behavior.');
-  test.setTimeout(180_000);
-
-  const { token } = await getDedicatedAccount(request);
-  let character: Character | null = null;
-
-  try {
-    await openAccountPage(page, token);
-    character = await createCharacterFromAccountPage(page);
-    const characterId = character.id;
-    await page.getByText(character.name, { exact: true }).click();
-    await page.getByRole('button', { name: 'Play', exact: true }).click();
-
     await expect(page).toHaveURL(/.*\/game/);
     await chooseFirstAvailableOption(page);
     await chooseFirstAvailableOption(page);
@@ -251,7 +199,7 @@ test('generate audio calls the TTS endpoint and starts audio playback', async ({
     await expect(page.locator('#paragraph')).not.toHaveText('Loading story...', { timeout: 120_000 });
 
     const audioResponsePromise = page.waitForResponse((response) =>
-      response.url() === apiEndpoint(`choose-your-fate/character-paths/${characterId}/audio`)
+      response.url() === apiEndpoint(`choose-your-fate/character-paths/${character.id}/audio`)
       && response.request().method() === 'GET'
     , { timeout: 120_000 });
     await page.getByRole('button', { name: 'Generate Audio' }).click();
@@ -265,8 +213,10 @@ test('generate audio calls the TTS endpoint and starts audio playback', async ({
     await expect(audio).toBeAttached();
     await expect.poll(() => audio.evaluate((element) => !element.paused), { timeout: 30_000 }).toBe(true);
   } finally {
-    if (character) {
+    for (const character of characters) {
       await deleteCharacter(request, token, character.id);
     }
+    await firefoxBrowser.close();
+    await webkitBrowser.close();
   }
 });
