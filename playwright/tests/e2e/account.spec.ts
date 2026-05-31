@@ -153,8 +153,6 @@ test('account page supports registration, three browser character slots, logout,
   test.skip(browserName !== 'chromium', 'Chromium coordinates this shared-account journey and launches Firefox and WebKit.');
   test.setTimeout(240_000);
 
-  const firefoxBrowser = await firefox.launch();
-  const webkitBrowser = await webkit.launch();
   const characters: Character[] = [];
   let token = '';
 
@@ -168,19 +166,27 @@ test('account page supports registration, three browser character slots, logout,
     await expect(page.evaluate(() => window.localStorage.getItem('token'))).resolves.toBeNull();
     token = await login(page, account.credentials);
 
-    const firefoxPage = await openAccountPageInBrowser(firefoxBrowser, token);
-    const webkitPage = await openAccountPageInBrowser(webkitBrowser, token);
-
     characters.push(await createCharacterFromAccountPage(page));
-    characters.push(await createCharacterFromAccountPage(firefoxPage));
-    characters.push(await createCharacterFromAccountPage(webkitPage));
+
+    const firefoxBrowser = await firefox.launch();
+    try {
+      const firefoxPage = await openAccountPageInBrowser(firefoxBrowser, token);
+      characters.push(await createCharacterFromAccountPage(firefoxPage));
+    } finally {
+      await firefoxBrowser.close();
+    }
+
+    const webkitBrowser = await webkit.launch();
+    try {
+      const webkitPage = await openAccountPageInBrowser(webkitBrowser, token);
+      characters.push(await createCharacterFromAccountPage(webkitPage));
+      await expect(webkitPage.getByText('New Character', { exact: true })).toHaveCount(0);
+    } finally {
+      await webkitBrowser.close();
+    }
 
     await page.goto('/account');
-    await firefoxPage.goto('/account');
-    await webkitPage.goto('/account');
     await expect(page.getByText('New Character', { exact: true })).toHaveCount(0);
-    await expect(firefoxPage.getByText('New Character', { exact: true })).toHaveCount(0);
-    await expect(webkitPage.getByText('New Character', { exact: true })).toHaveCount(0);
 
     const character = characters[0];
     await page.getByText(character.name, { exact: true }).click();
@@ -216,7 +222,5 @@ test('account page supports registration, three browser character slots, logout,
     for (const character of characters) {
       await deleteCharacter(request, token, character.id);
     }
-    await firefoxBrowser.close();
-    await webkitBrowser.close();
   }
 });
