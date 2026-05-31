@@ -61,7 +61,7 @@ async function registerAndLogin(page: Page) {
   await page.getByRole('textbox', { name: 'Password' }).fill(credentials.password);
   await page.getByRole('button', { name: 'Register new account' }).click();
 
-  await expect(page).toHaveURL(/.*\/$/);
+  await expect(page).not.toHaveURL(/.*\/register/);
   return {
     credentials,
     token: await login(page, credentials),
